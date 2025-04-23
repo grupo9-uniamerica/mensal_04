@@ -1,0 +1,34 @@
+name: Deploy Mensal02
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  deploy:
+    name: Deploy nas VMs
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Clonar repositório
+      uses: actions/checkout@v3
+
+    - name: 🗝️ Configurar acesso SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: 🛡️ Adicionar FRONT_HOST ao known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.FRONT_HOST }} >> ~/.ssh/known_hosts
+
+    - name: 📤 Copiar código para a VM FRONTEND
+      run: |
+        echo "🔄 Enviando projeto completo para a FRONT (10.0.0.3)..."
+        rsync -avz ./ ${{ secrets.FRONT_USER }}@${{ secrets.FRONT_HOST }}:/home/${{ secrets.FRONT_USER }}/mensal02/
+
+    - name: 🚀 Executar deploy inteligente a partir da FRONT
+      run: |
+        echo "🚀 Rodando script de deploy na FRONT"
+        ssh ${{ secrets.FRONT_USER }}@${{ secrets.FRONT_HOST }} "cd /home/${{ secrets.FRONT_USER }}/mensal02 && chmod +x deploy.sh && ./deploy.sh"
