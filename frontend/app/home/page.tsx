@@ -378,7 +378,7 @@ export default function StudyRoomScheduler() {
   // Função para buscar as salas do endpoint
   const fetchRooms = useCallback(async (): Promise<Room[]> => {
     try {
-      const response = await fetch('http://backend:8000/rooms/');
+      const response = await fetch('http://backend:8080/rooms/');
       if (!response.ok) throw new Error("Erro ao buscar salas");
       return await response.json();
     } catch (error) {
