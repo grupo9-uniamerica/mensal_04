@@ -5,7 +5,7 @@ WORKDIR /app
 # Copiar arquivos essenciais
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
-
+COPY .env .env
 # Copiar código-fonte e construir a aplicação
 COPY . .
 RUN npm run build

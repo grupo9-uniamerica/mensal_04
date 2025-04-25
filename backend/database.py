@@ -5,7 +5,7 @@ def get_db_connection():
     """Função que retorna uma conexão com o banco de dados MySQL."""
     try:
         conn = mysql.connector.connect(
-            host='mysql',
+            host='host.docker.internal',
             user='admin',
             password='kappa110520',
             database='salasdb',

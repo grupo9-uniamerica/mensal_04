@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: loungegario/backend:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "mysql"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_NAME
+          value: "salasdb"
+        - name: DB_USER
+          value: "admin"
+        - name: DB_PASSWORD
+          value: "kappa110520"
