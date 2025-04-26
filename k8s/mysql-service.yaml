@@ -7,5 +7,4 @@ spec:
     app: mysql
   ports:
     - port: 3306
-      targetPort: 3306
-  clusterIP: None  # ou use default (sem essa linha) se preferir service com IP fixo interno
+  clusterIP: None  # ou remova se preferir IP atribuído

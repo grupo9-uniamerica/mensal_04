@@ -13,18 +13,27 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: loungegario/backend:latest
-        ports:
-        - containerPort: 8080
-        env:
-        - name: DB_HOST
-          value: "mysql"
-        - name: DB_PORT
-          value: "3306"
-        - name: DB_NAME
-          value: "salasdb"
-        - name: DB_USER
-          value: "admin"
-        - name: DB_PASSWORD
-          value: "kappa110520"
+        - name: backend
+          image: loungegario/backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD

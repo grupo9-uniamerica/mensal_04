@@ -13,7 +13,10 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: loungegario/frontend:latest
-        ports:
-        - containerPort: 3000
+        - name: frontend
+          image: loungegario/frontend:latest
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "http://localhost:8080"
+          ports:
+            - containerPort: 3000

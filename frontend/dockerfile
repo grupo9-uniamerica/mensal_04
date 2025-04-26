@@ -1,32 +1,32 @@
-# Etapa 1: Construção
-FROM node:18 AS builder
+# Etapa 1: Build
+FROM node:18-slim AS builder
 WORKDIR /app
 
-# Copiar arquivos essenciais
-COPY package.json package-lock.json ./
+# Instala apenas o que é necessário
+COPY package*.json ./
 RUN npm install --frozen-lockfile
-COPY .env .env
-# Copiar código-fonte e construir a aplicação
+
+# Copia o restante dos arquivos e builda o app
 COPY . .
 RUN npm run build
 
-# Etapa 2: Servidor de Produção
-FROM node:18 AS runner
+# Etapa 2: Imagem final, super leve
+FROM node:18-slim AS runner
 WORKDIR /app
 
-# Copiar artefatos gerados na etapa anterior
-COPY --from=builder /app/package.json ./
+# Copiar somente o necessário para rodar a aplicação
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
 
-# Instalar apenas dependências de produção
-RUN npm install --production --frozen-lockfile
+# Instalar dependências de produção
+RUN npm install --production
 
-# Definir variável de ambiente para execução em produção
+# Variáveis de ambiente para produção
 ENV NODE_ENV=production
 
-# Expor porta padrão do Next.js
+# Expõe a porta padrão do Next.js
 EXPOSE 3000
 
-# Comando para iniciar o servidor
-CMD ["npm", "run", "start"]
+# Comando para rodar o servidor
+CMD ["npm", "start"]
