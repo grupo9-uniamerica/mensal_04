@@ -57,9 +57,6 @@ def create_tables():
             cursor.close()
             conn.close()
 
-# Inicializa as tabelas ao importar o módulo
-create_tables()
-
 def room_exists(room_id):
     """Verifica se uma sala existe"""
     conn = None
@@ -188,6 +185,7 @@ def add_reservation(room_id: int, user_name: str, start_time: datetime, end_time
         if conn and conn.is_connected():
             cursor.close()
             conn.close()
+
 def get_all_reservations():
     """Obtém todas as reservas"""
     conn = None

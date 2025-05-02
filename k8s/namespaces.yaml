@@ -4,6 +4,8 @@ metadata:
   name: frontend
   labels:
     name: frontend
+    environment: production
+    component: ui
 ---
 apiVersion: v1
 kind: Namespace
@@ -11,10 +13,14 @@ metadata:
   name: backend
   labels:
     name: backend
+    environment: production
+    component: api
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: database
   labels:
-    name: database 
+    name: database
+    environment: production
+    component: storage 

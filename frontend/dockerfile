@@ -24,8 +24,9 @@ RUN npm install --production
 
 # Variáveis de ambiente para produção
 ENV NODE_ENV=production
+ENV PORT=3000
 
-# Expõe a porta padrão do Next.js
+# Expõe a porta 3000
 EXPOSE 3000
 
 # Comando para rodar o servidor

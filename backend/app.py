@@ -17,18 +17,31 @@ from models import (
     get_all_reservations, 
     get_all_rooms,
     room_exists,
-    check_room_availability  # Adicione esta importação
+    check_room_availability,  # Adicione esta importação
+    create_tables  # Adicione esta importação
 )
 
 app = FastAPI(title="Sistema de Reserva de Salas",
               description="API para gerenciar salas e reservas",
               version="1.0.0")
 
+@app.get("/health")
+async def health_check():
+    """Endpoint para verificação de saúde da aplicação"""
+    return {"status": "healthy"}
+
+@app.on_event("startup")
+async def startup_event():
+    """Evento executado quando a aplicação inicia"""
+    try:
+        create_tables()
+    except Exception as e:
+        print(f"Erro ao criar tabelas: {e}")
 
 # Configuração de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://127.0.0.1:61814"],  # Permite o frontend
+    allow_origins=["*"],  # Permite todos os domínios em desenvolvimento
     allow_credentials=True,
     allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permite todos os headers
@@ -280,7 +293,6 @@ def verify_database_connection():
             print("Banco de dados indisponível. Inicializando backend sem banco.")
     except Error as e:
         print(f"Erro ao conectar ao banco de dados: {e}")
-
 
 
 if __name__ == "__main__":

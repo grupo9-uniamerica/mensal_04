@@ -1,8 +1,21 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-//  output: 'export', // Adicione esta linha
-  // Outras configurações podem ser adicionadas aqui
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/rooms/:path*',
+        destination: 'http://backend.frontend.svc.cluster.local:8080/rooms/:path*',
+      },
+      {
+        source: '/token',
+        destination: 'http://backend.frontend.svc.cluster.local:8080/token',
+      },
+      {
+        source: '/reservations/:path*',
+        destination: 'http://backend.frontend.svc.cluster.local:8080/reservations/:path*',
+      },
+    ];
+  },
 };
 
-export default nextConfig;
+export default nextConfig; 

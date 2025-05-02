@@ -1,15 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: frontend-policy
-  namespace: frontend
+  name: database-policy
+  namespace: database
 spec:
   podSelector:
     matchLabels:
-      app: frontend
+      app: mysql
   policyTypes:
   - Ingress
-  - Egress
   ingress:
   - from:
     - namespaceSelector:
@@ -17,29 +16,9 @@ spec:
           name: frontend
   egress:
   - to:
+    - namespaceSelector:
+        matchLabels:
+          name: frontend
     - namespaceSelector:
         matchLabels:
           name: backend
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: backend-policy
-  namespace: backend
-spec:
-  podSelector:
-    matchLabels:
-      app: backend
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: frontend
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: database 
