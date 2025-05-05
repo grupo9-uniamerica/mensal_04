@@ -1,8 +1,7 @@
-    node_modules/
-    .next/
-    .git/
-    .gitignore
-    Dockerfile
-    eslint.config.mjs
-    next-env.d.ts
-    README.md
+node_modules/
+.git/
+.gitignore
+Dockerfile
+eslint.config.mjs
+next-env.d.ts
+README.md

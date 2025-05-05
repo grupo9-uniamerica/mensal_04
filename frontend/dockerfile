@@ -1,33 +1,31 @@
-# Etapa 1: Build
-FROM node:18-slim AS builder
+# Etapa 1: Build do Next.js
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Instala apenas o que é necessário
 COPY package*.json ./
-RUN npm install --frozen-lockfile
+RUN npm install
 
-# Copia o restante dos arquivos e builda o app
 COPY . .
 RUN npm run build
 
-# Etapa 2: Imagem final, super leve
-FROM node:18-slim AS runner
+# Etapa 2: Imagem final standalone
+FROM node:18-alpine
 WORKDIR /app
 
-# Copiar somente o necessário para rodar a aplicação
-COPY --from=builder /app/.next ./.next
+# Copiar o app gerado no modo standalone
+COPY --from=builder /app/.next/standalone/. ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./
 
-# Instalar dependências de produção
-RUN npm install --production
-
-# Variáveis de ambiente para produção
+# Definir variáveis de ambiente
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Expõe a porta 3000
+# Expor a porta do Next.js
 EXPOSE 3000
+EXPOSE 80
 
-# Comando para rodar o servidor
-CMD ["npm", "start"]
+# Comando para iniciar o servidor
+CMD ["node", "server.js"]

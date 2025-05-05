@@ -7,9 +7,9 @@ export default function LoginPage() {
   const [username, setusername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
+  const router = useRouter(); // Inicializa o roteamento
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -29,12 +29,20 @@ export default function LoginPage() {
       if (!response.ok) throw new Error("Credenciais inválidas");
 
       const data = await response.json();
-      localStorage.setItem("jwt", data.access_token);
-      alert("Login realizado com sucesso!");
-      router.push("/home");
+      
+      try {
+        localStorage.setItem("jwt", data.access_token);
+        alert("Login realizado com sucesso!");
+        router.push("/home");
+      } catch (storageErr) {
+        console.error("Erro ao acessar localStorage:", storageErr);
+        // Se não conseguir salvar no localStorage, ainda assim redireciona
+        router.push("/home");
+      }
     } catch (err) {
       console.error("Erro ao fazer login:", err);
 
+      // Verifica se err é uma instância de Error
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -53,7 +61,7 @@ export default function LoginPage() {
             type="text"
             placeholder="Digite seu nome de usuário"
             value={username}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setusername(e.target.value)}
+            onChange={(e) => setusername(e.target.value)}
             required
             style={styles.input}
           />
@@ -61,7 +69,7 @@ export default function LoginPage() {
             type="password"
             placeholder="Digite sua senha"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
             style={styles.input}
           />
@@ -80,13 +88,13 @@ const styles = {
     height: "100vh",
     background: "linear-gradient(45deg, #6a11cb, #2575fc)",
     color: "black",
-  } as React.CSSProperties,
+  } as React.CSSProperties, // Define tipagem correta
   loginBox: {
     background: "white",
     padding: "30px",
     borderRadius: "10px",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-    textAlign: "center" as const,
+    textAlign: "center" as const, // Corrige tipagem
     width: "300px",
     color: "black",
   } as React.CSSProperties,

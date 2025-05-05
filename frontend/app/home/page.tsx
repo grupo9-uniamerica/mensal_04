@@ -96,13 +96,13 @@ const RoomCard = styled.div<{ $available: boolean }>`
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
-  opacity: ${({ $available }: { $available: boolean }) => ($available ? 1 : 0.6)};
-  cursor: ${({ $available }: { $available: boolean }) => ($available ? 'pointer' : 'not-allowed')};
+  opacity: ${({ $available }) => ($available ? 1 : 0.6)};
+  cursor: ${({ $available }) => ($available ? 'pointer' : 'not-allowed')};
 
   &:hover {
-    transform: ${({ $available }: { $available: boolean }) => ($available ? 'translateY(-5px)' : 'none')};
-    box-shadow: ${({ $available }: { $available: boolean }) => ($available ? '0 10px 20px rgba(0, 0, 0, 0.2)' : 'none')};
-    border-color: ${({ $available }: { $available: boolean }) => ($available ? '#3182ce' : 'rgba(255, 255, 255, 0.1)')};
+    transform: ${({ $available }) => ($available ? 'translateY(-5px)' : 'none')};
+    box-shadow: ${({ $available }) => ($available ? '0 10px 20px rgba(0, 0, 0, 0.2)' : 'none')};
+    border-color: ${({ $available }) => ($available ? '#3182ce' : 'rgba(255, 255, 255, 0.1)')};
   }
 `;
 
@@ -140,8 +140,8 @@ const AvailabilityBadge = styled.span<{ $available: boolean }>`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  background: ${({ $available }: { $available: boolean }) => ($available ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)')};
-  color: ${({ $available }: { $available: boolean }) => ($available ? '#10b981' : '#ef4444')};
+  background: ${({ $available }) => ($available ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)')};
+  color: ${({ $available }) => ($available ? '#10b981' : '#ef4444')};
 `;
 
 const BookButton = styled.button<{ $available: boolean }>`
@@ -150,9 +150,9 @@ const BookButton = styled.button<{ $available: boolean }>`
   margin-top: 1rem;
   border-radius: 8px;
   border: none;
-  background: ${({ $available }: { $available: boolean }) => ($available ? 'linear-gradient(135deg, #3182ce, #2563eb)' : 'rgba(255, 255, 255, 0.05)')};
-  color: ${({ $available }: { $available: boolean }) => ($available ? 'white' : 'rgba(255, 255, 255, 0.3)')};
-  cursor: ${({ $available }: { $available: boolean }) => ($available ? 'pointer' : 'not-allowed')};
+  background: ${({ $available }) => ($available ? 'linear-gradient(135deg, #3182ce, #2563eb)' : 'rgba(255, 255, 255, 0.05)')};
+  color: ${({ $available }) => ($available ? 'white' : 'rgba(255, 255, 255, 0.3)')};
+  cursor: ${({ $available }) => ($available ? 'pointer' : 'not-allowed')};
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -160,8 +160,8 @@ const BookButton = styled.button<{ $available: boolean }>`
   gap: 0.5rem;
 
   &:hover {
-    transform: ${({ $available }: { $available: boolean }) => ($available ? 'scale(1.02)' : 'none')};
-    box-shadow: ${({ $available }: { $available: boolean }) => ($available ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none')};
+    transform: ${({ $available }) => ($available ? 'scale(1.02)' : 'none')};
+    box-shadow: ${({ $available }) => ($available ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none')};
   }
 `;
 
@@ -237,8 +237,8 @@ const ActionButton = styled.button<{ $primary?: boolean }>`
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   border: none;
-  background: ${({ $primary }: { $primary?: boolean }) => ($primary ? 'linear-gradient(135deg, #3182ce, #2563eb)' : 'rgba(255, 255, 255, 0.05)')};
-  color: ${({ $primary }: { $primary?: boolean }) => ($primary ? 'white' : '#a0aec0')};
+  background: ${({ $primary }) => ($primary ? 'linear-gradient(135deg, #3182ce, #2563eb)' : 'rgba(255, 255, 255, 0.05)')};
+  color: ${({ $primary }) => ($primary ? 'white' : '#a0aec0')};
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
