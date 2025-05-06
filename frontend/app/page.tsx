@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+//teste
 export default function Page() {
   const router = useRouter();
 
