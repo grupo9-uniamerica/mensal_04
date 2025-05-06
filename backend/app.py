@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
+#teste
 from models import (
     add_room, 
     delete_room,
@@ -95,7 +95,7 @@ def authenticate_user(username: str, password: str):
         return None  # Melhor que False
     return user
 
-@app.post("/token", response_model=Token)
+@app.post("/token/", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
