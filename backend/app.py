@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
+#teste
 from models import (
     add_room, 
     delete_room,

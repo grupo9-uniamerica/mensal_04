@@ -82,13 +82,13 @@ jobs:
       - name: Update frontend deployment
         if: needs.changes.outputs.frontend == 'true'
         run: |
-          kubectl set image deployment/frontend frontend=$FRONT_IMAGE
+          kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend
 
       # Atualizar backend no GKE
       - name: Update backend deployment
         if: needs.changes.outputs.backend == 'true'
         run: |
-          kubectl set image deployment/backend backend=$BACK_IMAGE
+          kubectl set image deployment/backend backend=$BACK_IMAGE -n backend
 
       # Aplicar YAMLs do k8s se tiverem sido alterados
       - name: Apply Kubernetes manifests
