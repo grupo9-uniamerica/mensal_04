@@ -2,7 +2,7 @@ name: Deploy Frontend and Backend to GKE
 
 on:
   push:
-    branches: [ master, release, dev ]
+    branches: [ master ]
 
 env:
   GKE_CLUSTER: cluster
@@ -10,8 +10,8 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
   DOCKER_USER: loungegario
-  FRONT_IMAGE: loungegario/frontend:${{ github.ref_name }}
-  BACK_IMAGE: loungegario/backend:${{ github.ref_name }}
+  FRONT_IMAGE: loungegario/frontend:latest
+  BACK_IMAGE: loungegario/backend:latest
 
 jobs:
   changes:
@@ -43,54 +43,57 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Docker Hub Login
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
+      # Build e push frontend se necessário
       - name: Build and Push Frontend
         if: needs.changes.outputs.frontend == 'true'
         run: |
           docker build -t $FRONT_IMAGE ./frontend
           docker push $FRONT_IMAGE
 
+      # Build e push backend se necessário
       - name: Build and Push Backend
         if: needs.changes.outputs.backend == 'true'
         run: |
           docker build -t $BACK_IMAGE ./backend
           docker push $BACK_IMAGE
 
-      # BLOCO DE DEPLOY — somente se branch for release ou master
+      # Autenticação GCP
       - name: Authenticate to Google Cloud
-        if: github.ref_name == 'master' || github.ref_name == 'release'
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Google Cloud SDK
-        if: github.ref_name == 'master' || github.ref_name == 'release'
         uses: google-github-actions/setup-gcloud@v1
 
+      # Instalar plugin de autenticação GKE
       - name: Install GKE gcloud auth plugin
-        if: github.ref_name == 'master' || github.ref_name == 'release'
         run: |
           gcloud components install gke-gcloud-auth-plugin --quiet
 
       - name: Get GKE Credentials
-        if: github.ref_name == 'master' || github.ref_name == 'release'
         run: gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $PROJECT_ID
 
+      # Atualizar frontend no GKE
       - name: Update frontend deployment
-        if: (needs.changes.outputs.frontend == 'true') && (github.ref_name == 'master' || github.ref_name == 'release')
+        if: needs.changes.outputs.frontend == 'true'
         run: |
           kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend
           kubectl rollout restart deployment/frontend -n frontend
 
+      # Atualizar backend no GKE
       - name: Update backend deployment
-        if: (needs.changes.outputs.backend == 'true') && (github.ref_name == 'master' || github.ref_name == 'release')
+        if: needs.changes.outputs.backend == 'true'
         run: |
           kubectl set image deployment/backend backend=$BACK_IMAGE -n backend
           kubectl rollout restart deployment/backend -n backend
 
+      # Aplicar YAMLs do k8s se tiverem sido alterados
       - name: Apply Kubernetes manifests
-        if: (needs.changes.outputs.k8s == 'true') && (github.ref_name == 'master' || github.ref_name == 'release')
+        if: needs.changes.outputs.k8s == 'true'
         run: |
           kubectl apply -f k8s/
