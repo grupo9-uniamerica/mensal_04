@@ -4,7 +4,6 @@ metadata:
   name: frontend-config
   namespace: frontend
 data:
-  NEXT_PUBLIC_API_URL: "http://backend.backend.svc.cluster.local:8080"
   NODE_ENV: "production"
   PORT: "3000"
   HOSTNAME: "0.0.0.0"

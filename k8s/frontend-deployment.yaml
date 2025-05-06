@@ -34,13 +34,13 @@ spec:
             cpu: "200m"
         readinessProbe:
           httpGet:
-            path: /
+            path: /_next/static/development/_buildManifest.js
             port: http
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           httpGet:
-            path: /
+            path: /_next/static/development/_buildManifest.js
             port: http
           initialDelaySeconds: 15
           periodSeconds: 20

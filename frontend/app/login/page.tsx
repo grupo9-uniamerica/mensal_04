@@ -17,8 +17,9 @@ export default function LoginPage() {
     formData.append("username", username);
     formData.append("password", password);
 
+
     try {
-      const response = await fetch("/token", {
+      const response = await fetch('http://34.39.140.137/api/token', {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -29,16 +30,9 @@ export default function LoginPage() {
       if (!response.ok) throw new Error("Credenciais inválidas");
 
       const data = await response.json();
-      
-      try {
-        localStorage.setItem("jwt", data.access_token);
-        alert("Login realizado com sucesso!");
-        router.push("/home");
-      } catch (storageErr) {
-        console.error("Erro ao acessar localStorage:", storageErr);
-        // Se não conseguir salvar no localStorage, ainda assim redireciona
-        router.push("/home");
-      }
+      localStorage.setItem("jwt", data.access_token); // Armazena o token
+      alert("Login realizado com sucesso!");
+      router.push("/home");
     } catch (err) {
       console.error("Erro ao fazer login:", err);
 
