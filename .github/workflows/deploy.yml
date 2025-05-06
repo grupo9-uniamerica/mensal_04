@@ -6,7 +6,7 @@ on:
 
 env:
   GKE_CLUSTER: cluster
-  GKE_ZONE: southamerica-east1-a
+  GKE_ZONE: southamerica-east1
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
   DOCKER_USER: loungegario
