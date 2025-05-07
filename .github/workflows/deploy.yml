@@ -2,7 +2,7 @@ name: Deploy Frontend and Backend to GKE
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, release, dev ]
 
 env:
   GKE_CLUSTER: cluster
@@ -40,6 +40,22 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.k8s == 'true'
     steps:
+      - name: Set Environment
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "FRONT_IMAGE=loungegario/frontend:prod" >> $GITHUB_ENV
+            echo "BACK_IMAGE=loungegario/backend:prod" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" = "refs/heads/release" ]; then
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+            echo "FRONT_IMAGE=loungegario/frontend:staging" >> $GITHUB_ENV
+            echo "BACK_IMAGE=loungegario/backend:staging" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=development" >> $GITHUB_ENV
+            echo "FRONT_IMAGE=loungegario/frontend:dev" >> $GITHUB_ENV
+            echo "BACK_IMAGE=loungegario/backend:dev" >> $GITHUB_ENV
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v3
 
