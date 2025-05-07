@@ -1,4 +1,4 @@
- name: Deploy Frontend and Backend to GKE
+name: Deploy Frontend and Backend to GKE
 
 on:
   push:
