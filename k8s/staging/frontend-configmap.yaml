@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: frontend-staging
+data:
+  NEXT_PUBLIC_API_URL: "http://34.39.140.138:3001"
+  NODE_ENV: "staging" 
