@@ -5,5 +5,7 @@ metadata:
   namespace: backend-dev
 data:
   DATABASE_HOST: "mysql.database-dev.svc.cluster.local"
-  DATABASE_NAME: "loungegario"
+  DATABASE_NAME: "mydb"
+  DATABASE_USER: "user"
+  DATABASE_PASSWORD: "user"
   NODE_ENV: "development" 

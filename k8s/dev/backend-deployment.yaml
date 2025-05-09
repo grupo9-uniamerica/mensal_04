@@ -20,35 +20,12 @@ spec:
     spec:
       containers:
         - name: backend
-          image: loungegario/backend:dev
+          image: loungegario/backend-dev:latest
           ports:
             - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: backend-config
-          env:
-            - name: DATABASE_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_USER
-            - name: DATABASE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_PASSWORD
-            - name: DATABASE_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-config
-                  key: DATABASE_HOST
-            - name: DATABASE_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-config
-                  key: DATABASE_NAME
-            - name: DATABASE_PORT
-              value: "3306"
           resources:
             requests:
               memory: "256Mi"

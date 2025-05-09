@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: loungegario/frontend:dev
+        image: loungegario/frontend-dev:latest
         workingDir: /app
         command: ["/bin/sh", "-c"]
         args: ["node server.js"]
@@ -34,13 +34,13 @@ spec:
             cpu: "200m"
         readinessProbe:
           httpGet:
-            path: /_next/static/development/_buildManifest.js
+            path: /
             port: http
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           httpGet:
-            path: /_next/static/development/_buildManifest.js
+            path: /
             port: http
           initialDelaySeconds: 15
           periodSeconds: 20 
