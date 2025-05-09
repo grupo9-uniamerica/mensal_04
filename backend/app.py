@@ -37,7 +37,7 @@ async def startup_event():
         create_tables()
     except Exception as e:
         print(f"Erro ao criar tabelas: {e}")
-
+#teste
 # Configuração de CORS
 app.add_middleware(
     CORSMiddleware,

@@ -51,7 +51,10 @@ jobs:
       - name: Build and Push Frontend
         if: needs.changes.outputs.frontend == 'true'
         run: |
-          docker build -t $FRONT_IMAGE ./frontend
+          docker build \
+            --build-arg NEXT_PUBLIC_APP_URL=http://34.39.140.137 \
+            --build-arg NEXT_PUBLIC_BACKEND_URL=http://backend.backend.svc.cluster.local:8080 \
+            -t $FRONT_IMAGE ./frontend
           docker push $FRONT_IMAGE
 
       # Build e push backend se necessário
