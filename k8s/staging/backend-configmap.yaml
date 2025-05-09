@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: backend-staging
+data:
+  DATABASE_HOST: "mysql.database-staging.svc.cluster.local"
+  DATABASE_NAME: "loungegario"
+  NODE_ENV: "staging" 

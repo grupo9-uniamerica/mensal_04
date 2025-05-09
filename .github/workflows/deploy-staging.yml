@@ -1,8 +1,8 @@
-name: Deploy Frontend and Backend to GKE
+name: Deploy to Staging
 
 on:
   push:
-    branches: [ master ]
+    branches: [ release ]
 
 env:
   GKE_CLUSTER: cluster
@@ -10,8 +10,8 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
   DOCKER_USER: loungegario
-  FRONT_IMAGE: loungegario/frontend:latest
-  BACK_IMAGE: loungegario/backend:latest
+  FRONT_IMAGE: loungegario/frontend-staging:latest
+  BACK_IMAGE: loungegario/backend-staging:latest
 
 jobs:
   changes:
@@ -33,7 +33,7 @@ jobs:
             backend:
               - 'backend/**'
             k8s:
-              - 'k8s/producao/**'
+              - 'k8s/staging/**'
 
   build-and-deploy:
     needs: changes
@@ -82,18 +82,18 @@ jobs:
       - name: Update frontend deployment
         if: needs.changes.outputs.frontend == 'true'
         run: |
-          kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend
-          kubectl rollout restart deployment/frontend -n frontend
+          kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend-staging
+          kubectl rollout restart deployment/frontend -n frontend-staging
 
       # Atualizar backend no GKE
       - name: Update backend deployment
         if: needs.changes.outputs.backend == 'true'
         run: |
-          kubectl set image deployment/backend backend=$BACK_IMAGE -n backend
-          kubectl rollout restart deployment/backend -n backend
+          kubectl set image deployment/backend backend=$BACK_IMAGE -n backend-staging
+          kubectl rollout restart deployment/backend -n backend-staging
 
       # Aplicar YAMLs do k8s se tiverem sido alterados
       - name: Apply Kubernetes manifests
         if: needs.changes.outputs.k8s == 'true'
         run: |
-          kubectl apply -f k8s/producao/
+          kubectl apply -f k8s/staging/ 

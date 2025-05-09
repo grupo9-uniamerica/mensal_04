@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: backend-dev
+data:
+  DATABASE_HOST: mysql.database-dev.svc.cluster.local
+  DATABASE_NAME: mydb
+  DATABASE_PASSWORD: user
+  DATABASE_PORT: "3306"
+  DATABASE_USER: user
+  NODE_ENV: development 
