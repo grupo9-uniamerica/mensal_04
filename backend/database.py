@@ -5,18 +5,19 @@ import os
 def get_db_connection():
     """Função que retorna uma conexão com o banco de dados MySQL."""
     try:
-        print(f"Tentando conectar ao MySQL com as seguintes configurações:")
-        print(f"Host: {os.getenv('DATABASE_HOST', 'mysql.database-dev.svc.cluster.local')}")
-        print(f"User: {os.getenv('DATABASE_USER', 'user')}")
-        print(f"Database: {os.getenv('DATABASE_NAME', 'mydb')}")
-        print(f"Port: {os.getenv('DATABASE_PORT', '3306')}")
+        # Logs para debug (sem valores padrão)
+        print("Tentando conectar ao MySQL com as seguintes configurações:")
+        print(f"Host: {os.getenv('DATABASE_HOST')}")
+        print(f"User: {os.getenv('DATABASE_USER')}")
+        print(f"Database: {os.getenv('DATABASE_NAME')}")
+        print(f"Port: {os.getenv('DATABASE_PORT', '3306')}")  # Porta padrão do MySQL é aceitável
         
         conn = mysql.connector.connect(
-            host=os.getenv('DATABASE_HOST', 'mysql.database-dev.svc.cluster.local'),
-            user=os.getenv('DATABASE_USER', 'user'),
-            password=os.getenv('DATABASE_PASSWORD', 'user'),
-            database=os.getenv('DATABASE_NAME', 'mydb'),
-            port=int(os.getenv('DATABASE_PORT', '3306')),
+            host=os.getenv('DATABASE_HOST'),
+            user=os.getenv('DATABASE_USER'),
+            password=os.getenv('DATABASE_PASSWORD'),
+            database=os.getenv('DATABASE_NAME'),
+            port=int(os.getenv('DATABASE_PORT', '3306')),  # Porta padrão do MySQL é aceitável
             auth_plugin='mysql_native_password'
         )
         print("Conexão com o MySQL estabelecida com sucesso!")

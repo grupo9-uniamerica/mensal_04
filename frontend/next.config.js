@@ -2,31 +2,26 @@
 const nextConfig = {
   output: 'standalone',
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;  // Acessando a variável de ambiente
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;           // Acessando a variável de ambiente
+
     return {
       beforeFiles: [
         {
-          source: '/api/rooms',
-          destination: 'http://backend.backend-dev.svc.cluster.local:8080/rooms/',
-        },
-        {
           source: '/api/rooms/:path*',
-          destination: 'http://backend.backend-dev.svc.cluster.local:8080/rooms/:path*/',
-        },
-        {
-          source: '/api/reservations',
-          destination: 'http://backend.backend-dev.svc.cluster.local:8080/reservations/',
+          destination: `${backendUrl}/rooms/:path*/`,  // Usando a URL do backend
         },
         {
           source: '/api/reservations/:path*',
-          destination: 'http://backend.backend-dev.svc.cluster.local:8080/reservations/:path*/',
+          destination: `${backendUrl}/reservations/:path*/`,  // Usando a URL do backend
         },
         {
           source: '/api/token',
-          destination: 'http://backend.backend-dev.svc.cluster.local:8080/token/',
+          destination: `${backendUrl}/token/`,  // Usando a URL do backend
         },
         {
           source: '/token',
-          destination: 'http://backend.backend-dev.svc.cluster.local:8080/token/',
+          destination: `${backendUrl}/token/`,  // Usando a URL do backend
         },
       ],
     };

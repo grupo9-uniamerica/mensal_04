@@ -19,7 +19,7 @@ export default function LoginPage() {
 
 
     try {
-      const response = await fetch('http://34.39.140.137/api/token', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
