@@ -4,6 +4,6 @@ metadata:
   name: frontend-config
   namespace: frontend-dev
 data:
-  NEXT_PUBLIC_BASE_URL: "http://backend.backend-dev.svc.cluster.local:3001"
-  NEXT_PUBLIC_API_URL: "http://backend.backend-dev.svc.cluster.local:3001"
+  NEXT_PUBLIC_BASE_URL: "http://35.198.6.122"
+  NEXT_PUBLIC_APP_URL: "http://35.198.6.122"
   NODE_ENV: "development" 

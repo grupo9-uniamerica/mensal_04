@@ -17,6 +17,8 @@ data:
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         capacity INT NOT NULL,
+        location VARCHAR(255) NOT NULL,
+        available BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -37,3 +39,9 @@ data:
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (room_id) REFERENCES rooms(id)
     );
+
+    -- Inserção das salas iniciais
+    INSERT INTO rooms (name, capacity, location, available) VALUES
+    ('Sala de Reunião A', 10, 'Primeiro Andar', TRUE),
+    ('Sala de Conferência B', 20, 'Segundo Andar', TRUE),
+    ('Sala de Treinamento C', 30, 'Terceiro Andar', TRUE); 

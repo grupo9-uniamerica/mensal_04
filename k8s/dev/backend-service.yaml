@@ -4,9 +4,10 @@ metadata:
   name: backend
   namespace: backend-dev
 spec:
-  type: ClusterIP
-  ports:
-  - port: 3001
-    targetPort: 8080
   selector:
-    app: backend 
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP 

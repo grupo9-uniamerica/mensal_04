@@ -378,7 +378,7 @@ export default function StudyRoomScheduler() {
   // Função para buscar as salas do endpoint
   const fetchRooms = useCallback(async (): Promise<Room[]> => {
     try {
-      const response = await fetch('http://34.39.140.137/api/rooms');
+      const response = await fetch('http://35.198.6.122/api/rooms');
       if (!response.ok) throw new Error("Erro ao buscar salas");
       return await response.json();
     } catch (error) {
@@ -460,7 +460,7 @@ export default function StudyRoomScheduler() {
       };
   
       // Envia para o backend com o token
-      const response = await fetch('http://34.39.140.137/api/rooms', {
+      const response = await fetch('http://35.198.6.122/api/rooms', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -496,7 +496,7 @@ export default function StudyRoomScheduler() {
         const token = localStorage.getItem("jwt");
         if (!token) throw new Error("Usuário não autenticado!");
     
-        const response = await fetch(`http://34.39.140.137/api/rooms/${roomId}`, {
+        const response = await fetch(`http://35.198.6.122/api/rooms/${roomId}`, {
           method: "DELETE",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -541,7 +541,7 @@ export default function StudyRoomScheduler() {
         end_time: formData.endTime,
       };
   
-      const response = await fetch('http://34.39.140.137/api/reservations', {
+      const response = await fetch('http://35.198.6.122/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reservation),
