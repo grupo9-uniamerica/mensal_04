@@ -33,7 +33,7 @@ jobs:
             backend:
               - 'backend/**'
             k8s:
-              - 'k8s/**'
+              - 'k8s/producao/**'
 
   build-and-deploy:
     needs: changes
@@ -96,4 +96,4 @@ jobs:
       - name: Apply Kubernetes manifests
         if: needs.changes.outputs.k8s == 'true'
         run: |
-          kubectl apply -f k8s/
+          kubectl apply -f k8s/producao/
