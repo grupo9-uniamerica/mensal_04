@@ -86,17 +86,27 @@ jobs:
         if: needs.changes.outputs.frontend == 'true'
         run: |
           kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend
-          kubectl rollout restart deployment/frontend -n frontend
 
       # Atualizar backend no GKE
       - name: Update backend deployment
         if: needs.changes.outputs.backend == 'true'
         run: |
           kubectl set image deployment/backend backend=$BACK_IMAGE -n backend
-          kubectl rollout restart deployment/backend -n backend
 
       # Aplicar YAMLs do k8s se tiverem sido alterados
       - name: Apply Kubernetes manifests
         if: needs.changes.outputs.k8s == 'true'
         run: |
           kubectl apply -f k8s/producao/
+
+      # Reiniciar deployments após todas as alterações
+      - name: Restart deployments
+        run: |
+          if [ "${{ needs.changes.outputs.frontend }}" == "true" ]; then
+            kubectl rollout restart deployment/frontend -n frontend
+            kubectl rollout status deployment/frontend -n frontend --timeout=300s
+          fi
+          if [ "${{ needs.changes.outputs.backend }}" == "true" ]; then
+            kubectl rollout restart deployment/backend -n backend
+            kubectl rollout status deployment/backend -n backend --timeout=300s
+          fi
