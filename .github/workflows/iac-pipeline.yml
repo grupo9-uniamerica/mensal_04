@@ -19,7 +19,11 @@ jobs:
       - name: Criar chave.json
         run: |
           mkdir -p terraform
-          echo "${{ secrets.GCP_CREDENTIALS }}" | base64 -d > terraform/chave.json
+          echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode > terraform/chave.json
+
+      - name: Debug chave.json (remova depois de testar)
+        run: |
+          head terraform/chave.json
 
       - name: Criar SSH public key
         run: |
