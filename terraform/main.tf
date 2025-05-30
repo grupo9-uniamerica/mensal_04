@@ -31,6 +31,45 @@ resource "google_compute_firewall" "allow_https" {
   target_tags   = ["https-server"]
 }
 
+resource "google_compute_firewall" "allow_frontend" {
+  name    = "allow-frontend"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["frontend-server"]
+}
+
+resource "google_compute_firewall" "allow_backend" {
+  name    = "allow-backend"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["backend-server"]
+}
+
+resource "google_compute_firewall" "allow_all" {
+  name    = "allow-all"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["1-65535"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["allow-all"]
+}
+
 resource "google_compute_instance" "vm_instance" {
   name         = "vm-iac"
   machine_type = "e2-medium"
@@ -47,7 +86,7 @@ resource "google_compute_instance" "vm_instance" {
     access_config {}
   }
 
-  tags = ["http-server", "https-server"]
+  tags = ["allow-all"]
 
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"

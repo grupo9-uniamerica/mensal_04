@@ -22,6 +22,20 @@
         groups: docker
         append: yes
 
+    - name: Configure iptables rules
+      shell: |
+        iptables -A FORWARD -i docker0 -o eth0 -j ACCEPT
+        iptables -A FORWARD -i eth0 -o docker0 -j ACCEPT
+        iptables -A FORWARD -i docker0 -o docker0 -j ACCEPT
+        iptables-save > /etc/iptables/rules.v4
+      args:
+        creates: /etc/iptables/rules.v4
+
+    - name: Install iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+
     - name: Clone o repositório
       git:
         repo: 'https://github.com/grupo9-uniamerica/mensal_04.git'
