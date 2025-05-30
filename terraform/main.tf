@@ -1,3 +1,10 @@
+terraform {
+  backend "gcs" {
+    bucket = "projeto-iac-tfstate-loungegario"   
+    prefix = "terraform/state"
+  }
+}
+
 provider "google" {
   credentials = file("chave.json")
   project     = "projeto-iac-461322"
@@ -76,8 +83,8 @@ resource "google_compute_instance" "vm_instance" {
 
   boot_disk {
     initialize_params {
-        image = "ubuntu-os-cloud/ubuntu-2204-lts"
-        size  = 20
+      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+      size  = 20
     }
   }
 
@@ -96,6 +103,3 @@ resource "google_compute_instance" "vm_instance" {
 output "public_ip" {
   value = google_compute_instance.vm_instance.network_interface[0].access_config[0].nat_ip
 }
-
-
-
