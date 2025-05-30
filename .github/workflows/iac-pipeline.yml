@@ -6,8 +6,11 @@ on:
       - main
 
 jobs:
-  deploy:
+  infra:
+    name: Provision Infra
     runs-on: ubuntu-latest
+    outputs:
+      vm_ip: ${{ steps.ip.outputs.vm_ip }}
 
     steps:
       - name: Checkout do código
@@ -21,6 +24,9 @@ jobs:
       - name: Init Terraform
         run: cd terraform && terraform init
 
+      - name: Plan Terraform
+        run: cd terraform && terraform plan
+
       - name: Apply Terraform
         run: cd terraform && terraform apply -auto-approve
 
@@ -28,17 +34,33 @@ jobs:
         id: ip
         run: |
           cd terraform
-          terraform output -raw public_ip > ../ansible/ip.txt
+          IP=$(terraform output -raw public_ip)
+          echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+
+  deploy:
+    name: Configure VM
+    needs: infra
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
       - name: Setup Ansible
         run: |
           sudo apt update
           sudo apt install -y ansible sshpass
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Configurar Inventory
         run: |
           echo "[webserver]" > ansible/inventory.ini
-          echo "$(cat ansible/ip.txt) ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+          echo "${{ needs.infra.outputs.vm_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
 
       - name: Run Ansible Playbook
         run: |
