@@ -8,10 +8,6 @@ const nextConfig = {
     return {
       beforeFiles: [
         {
-          source: '/api/rooms',
-          destination: `${backendUrl}/rooms/`,
-        },
-        {
           source: '/api/rooms/:path*',
           destination: `${backendUrl}/rooms/:path*/`,  // Usando a URL do backend
         },
