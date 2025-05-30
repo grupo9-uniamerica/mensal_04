@@ -4,8 +4,16 @@ services:
   backend:
     build:
       context: ./backend
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=kappa110520
+      - DATABASE_NAME=salasdb
+      - DATABASE_PORT=3306
     ports:
       - "8080:8080"
+    depends_on:
+      - mysql
 
   frontend:
     build:
@@ -15,3 +23,21 @@ services:
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
     ports:
       - "3000:3000"
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: kappa110520
+      MYSQL_DATABASE: salasdb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: kappa110520
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./banco/my.cnf:/etc/mysql/conf.d/my.cnf
+
+volumes:
+  mysql_data:
