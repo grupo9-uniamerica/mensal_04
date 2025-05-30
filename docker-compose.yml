@@ -19,8 +19,8 @@ services:
     build:
       context: ./frontend
     environment:
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+      - NEXT_PUBLIC_APP_URL=http://34.95.147.47:3000
+      - NEXT_PUBLIC_BACKEND_URL=http://34.95.147.47:8080
     ports:
       - "3000:3000"
 
