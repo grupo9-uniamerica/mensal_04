@@ -16,6 +16,12 @@
         name: docker-compose
         state: present
 
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
     - name: Clone o repositório
       git:
         repo: 'https://github.com/grupo9-uniamerica/mensal_04.git'
