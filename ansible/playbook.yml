@@ -1,0 +1,27 @@
+- hosts: webserver
+  become: yes
+  tasks:
+    - name: Update apt
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Clone o repositório
+      git:
+        repo: 'https://github.com/grupo9-uniamerica/semanal04.git'
+        dest: /home/ubuntu/seuprojeto
+
+    - name: Subir com docker-compose
+      shell: docker compose up -d
+      args:
+        chdir: /home/ubuntu/seuprojeto
