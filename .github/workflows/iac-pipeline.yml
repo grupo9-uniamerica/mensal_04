@@ -19,7 +19,7 @@ jobs:
       - name: Criar chave.json
         run: |
           mkdir -p terraform
-          echo "${{ secrets.GCP_CREDENTIALS }}" > terraform/chave.json
+          echo "${{ secrets.GCP_CREDENTIALS }}" | base64 -d > terraform/chave.json
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
