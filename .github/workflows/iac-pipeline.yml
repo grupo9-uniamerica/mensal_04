@@ -51,8 +51,7 @@ jobs:
         id: ip
         run: |
           cd terraform
-          IP=$(terraform output -raw public_ip)
-          echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+          echo "vm_ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
 
       - name: Apagar chave.json
         run: rm terraform/chave.json
