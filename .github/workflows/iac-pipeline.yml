@@ -35,6 +35,9 @@ jobs:
         with:
           terraform_version: '1.6.0'
 
+      - name: Set GOOGLE_APPLICATION_CREDENTIALS
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/terraform/chave.json" >> $GITHUB_ENV
+
       - name: Init Terraform
         run: cd terraform && terraform init
 
