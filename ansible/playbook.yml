@@ -22,6 +22,17 @@
         groups: docker
         append: yes
 
+    - name: Install iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+
+    - name: Create iptables directory
+      file:
+        path: /etc/iptables
+        state: directory
+        mode: '0755'
+
     - name: Configure iptables rules
       shell: |
         iptables -A FORWARD -i docker0 -o eth0 -j ACCEPT
@@ -30,11 +41,6 @@
         iptables-save > /etc/iptables/rules.v4
       args:
         creates: /etc/iptables/rules.v4
-
-    - name: Install iptables-persistent
-      apt:
-        name: iptables-persistent
-        state: present
 
     - name: Clone o repositório
       git:
