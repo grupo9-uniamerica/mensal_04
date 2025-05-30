@@ -11,6 +11,7 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 COPY package*.json ./
+COPY next.config.js ./
 RUN npm install
 
 COPY . .
@@ -26,6 +27,7 @@ WORKDIR /app
 COPY --from=builder /app/.next/standalone/ ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./
 
 ENV NODE_ENV=production
 ENV PORT=3000
