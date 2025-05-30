@@ -16,6 +16,11 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Criar chave.json
+        run: |
+          mkdir -p terraform
+          echo "${{ secrets.GCP_CREDENTIALS }}" > terraform/chave.json
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -36,6 +41,9 @@ jobs:
           cd terraform
           IP=$(terraform output -raw public_ip)
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+
+      - name: Apagar chave.json
+        run: rm terraform/chave.json
 
   deploy:
     name: Configure VM
