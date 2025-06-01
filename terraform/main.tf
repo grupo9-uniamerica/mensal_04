@@ -12,6 +12,11 @@ provider "google" {
   zone        = "southamerica-east1-a"
 }
 
+variable "ssh_public_key" {
+  description = "Chave pública SSH para o usuário ubuntu"
+  type        = string
+}
+
 resource "google_compute_firewall" "allow_http" {
   name    = "allow-http"
   network = "default"
@@ -95,8 +100,8 @@ resource "google_compute_instance" "vm_instance" {
 
   tags = ["allow-all"]
 
-  metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+   metadata = {
+    ssh-keys = "ubuntu:${var.ssh_public_key}"
   }
 }
 

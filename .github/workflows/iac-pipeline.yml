@@ -21,11 +21,6 @@ jobs:
           mkdir -p terraform
           echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode > terraform/chave.json
 
-      - name: Criar SSH public key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -38,10 +33,14 @@ jobs:
         run: cd terraform && terraform init
 
       - name: Plan Terraform
-        run: cd terraform && terraform plan
+        run: |
+          cd terraform
+          terraform plan -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Apply Terraform
-        run: cd terraform && terraform apply -auto-approve
+        run: |
+          cd terraform
+          terraform apply -auto-approve -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Get VM IP
         id: ip
@@ -56,7 +55,6 @@ jobs:
           fi
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
           echo "✅ IP capturado e configurado com sucesso: $IP"
-
 
       - name: Apagar chave.json
         run: |
@@ -100,10 +98,10 @@ jobs:
             exit 1
           fi
           mkdir -p ansible
-          cat > ansible/inventory.ini << EOF
-          [webserver]
-          $VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
-          EOF
+          cat > ansible/inventory.ini <<EOF
+[webserver]
+$VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+EOF
           echo "✅ Inventory criado"
 
       - name: Debug Inventory
