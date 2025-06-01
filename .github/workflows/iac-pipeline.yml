@@ -21,10 +21,6 @@ jobs:
           mkdir -p terraform
           echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode > terraform/chave.json
 
-      - name: Debug chave.json (remova depois de testar)
-        run: |
-          head terraform/chave.json
-
       - name: Criar SSH public key
         run: |
           mkdir -p ~/.ssh
@@ -52,22 +48,14 @@ jobs:
         run: |
           echo "🚀 Iniciando captura do IP da VM..."
           cd terraform
-          echo "📂 Diretório atual: $(pwd)"
-    
-          echo "🔍 Executando terraform output..."
           IP=$(terraform output -raw public_ip)
-    
           echo "📝 IP capturado: '$IP'"
-    
           if [ -z "$IP" ]; then
             echo "❌ Erro: IP está vazio"
             exit 1
           fi
-    
-          echo "📤 Configurando output do job..."
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
           echo "✅ IP capturado e configurado com sucesso: $IP"
-
 
       - name: Apagar chave.json
         run: |
@@ -101,26 +89,15 @@ jobs:
           echo "✅ Chave SSH configurada"
           ls -la ~/.ssh/
 
-      - name: Debug VM IP
-        run: |
-          echo "🔍 Verificando IP da VM..."
-          echo "IP do output do job anterior: '${{ needs.infra.outputs.vm_ip }}'"
-          echo "📝 Conteúdo do vm_ip.txt:"
-          cat $GITHUB_WORKSPACE/vm_ip.txt
-
       - name: Configurar Inventory
         run: |
           echo "📋 Configurando inventory do Ansible..."
-    
           VM_IP="${{ needs.infra.outputs.vm_ip }}"
           echo "📝 IP capturado: '$VM_IP'"
-    
           if ! echo "$VM_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "❌ Erro: IP inválido recebido: '$VM_IP'"
             exit 1
           fi
-          echo "✅ IP válido"
-    
           mkdir -p ansible
           cat > ansible/inventory.ini << EOF
           [webserver]
@@ -128,42 +105,29 @@ jobs:
           EOF
           echo "✅ Inventory criado"
 
-
       - name: Debug Inventory
         run: |
           echo "🔍 Verificando inventory..."
-          echo "📝 Conteúdo do inventory.ini:"
           cat ansible/inventory.ini
-          echo "📝 Permissões do inventory.ini:"
           ls -la ansible/inventory.ini
 
       - name: Testar conexão SSH
         run: |
           echo "🔌 Testando conexão SSH..."
-          VM_IP=$(cat $GITHUB_WORKSPACE/vm_ip.txt)
+          VM_IP="${{ needs.infra.outputs.vm_ip }}"
           echo "📝 IP para conexão: '$VM_IP'"
-          
-          echo "🔑 Verificando chave SSH..."
-          ls -la ~/.ssh/id_rsa
-          
-          echo "🔄 Tentando conexão SSH..."
           ssh -v -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$VM_IP 'echo "Conexão SSH bem sucedida!"'
           if [ $? -eq 0 ]; then
             echo "✅ Conexão SSH estabelecida com sucesso!"
           else
             echo "❌ Falha na conexão SSH"
-            echo "🔍 Últimas linhas do log SSH:"
-            tail -n 20 ~/.ssh/ssh.log 2>/dev/null || echo "Log SSH não disponível"
             exit 1
           fi
 
       - name: Run Ansible Playbook
         run: |
           echo "🚀 Executando playbook Ansible..."
-          echo "📝 Conteúdo do playbook:"
           cat ansible/playbook.yml
-          
-          echo "🔄 Iniciando execução..."
           ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -vvv
           if [ $? -eq 0 ]; then
             echo "✅ Playbook executado com sucesso!"
@@ -171,4 +135,3 @@ jobs:
             echo "❌ Falha na execução do playbook"
             exit 1
           fi
-
