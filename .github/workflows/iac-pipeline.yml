@@ -50,14 +50,11 @@ jobs:
       - name: Get VM IP
         id: ip
         run: |
-          IP=$(terraform -chdir=terraform output -raw public_ip)
-          echo "IP capturado: $IP"
-          {
-            echo "vm_ip<<EOF"
-            echo "$IP"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
-
+          terraform -chdir=terraform output -raw public_ip > ip.txt
+          cat ip.txt
+          IP=$(cat ip.txt)
+          echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+          
       - name: Apagar chave.json
         run: rm terraform/chave.json
 
