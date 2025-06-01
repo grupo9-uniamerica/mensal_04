@@ -51,7 +51,7 @@ jobs:
         id: ip
         run: |
           unset TF_LOG
-          IP=$(terraform -chdir=terraform output -raw public_ip | tr -d '\r')
+          IP=$(terraform -chdir=terraform output -raw public_ip)
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
 
       - name: Apagar chave.json
