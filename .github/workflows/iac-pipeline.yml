@@ -50,15 +50,10 @@ jobs:
       - name: Get VM IP
         id: ip
         run: |
-          terraform -chdir=terraform output -raw public_ip > ip.txt
-          IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' ip.txt)
+          cd terraform
+          IP=$(terraform output -raw public_ip)
           echo "IP capturado: $IP"
-          if [ -z "$IP" ]; then
-            echo "❌ Erro: Não foi possível capturar o IP da VM"
-            exit 1
-          fi
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
-          rm ip.txt
 
       - name: Apagar chave.json
         run: rm terraform/chave.json
