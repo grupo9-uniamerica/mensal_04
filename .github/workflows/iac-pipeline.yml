@@ -50,11 +50,10 @@ jobs:
       - name: Get VM IP
         id: ip
         run: |
-          terraform -chdir=terraform output -raw public_ip | tr -d '\n' > ip.txt
-          cat ip.txt
-          IP=$(cat ip.txt)
+          IP=$(terraform -chdir=terraform output -raw public_ip)
+          echo "IP capturado: $IP"
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
-          
+
       - name: Apagar chave.json
         run: rm terraform/chave.json
 
@@ -84,14 +83,26 @@ jobs:
 
       - name: Configurar Inventory
         run: |
-          echo "[webserver]" > ansible/inventory.ini
-          echo "${{ needs.infra.outputs.vm_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
-          echo "" >> ansible/inventory.ini
+          cat > ansible/inventory.ini << EOF
+          [webserver]
+          ${{ needs.infra.outputs.vm_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+          EOF
 
       - name: Debug Inventory
         run: |
           echo "Conteúdo do inventory.ini:"
           cat ansible/inventory.ini
+
+      - name: Testar conexão SSH
+        run: |
+          echo "Testando conexão SSH com a VM..."
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ needs.infra.outputs.vm_ip }} 'echo "Conexão SSH bem sucedida!"'
+          if [ $? -eq 0 ]; then
+            echo "✅ Conexão SSH estabelecida com sucesso!"
+          else
+            echo "❌ Falha na conexão SSH"
+            exit 1
+          fi
 
       - name: Run Ansible Playbook
         run: |
