@@ -53,29 +53,21 @@ jobs:
           echo "🚀 Iniciando captura do IP da VM..."
           cd terraform
           echo "📂 Diretório atual: $(pwd)"
-          
+    
           echo "🔍 Executando terraform output..."
-          terraform output -raw public_ip > ip_raw.txt
-          echo "📝 Conteúdo do ip_raw.txt:"
-          cat ip_raw.txt
-          
-          echo "🧹 Limpando o output..."
-          IP=$(cat ip_raw.txt | tr -d '\n' | tr -d '\r')
-          echo "📝 IP após limpeza: '$IP'"
-          
+          IP=$(terraform output -raw public_ip)
+    
+          echo "📝 IP capturado: '$IP'"
+    
           if [ -z "$IP" ]; then
             echo "❌ Erro: IP está vazio"
             exit 1
           fi
-          
-          echo "💾 Salvando IP em arquivo..."
-          echo "$IP" > $GITHUB_WORKSPACE/vm_ip.txt
-          echo "📝 Conteúdo do vm_ip.txt:"
-          cat $GITHUB_WORKSPACE/vm_ip.txt
-          
+    
           echo "📤 Configurando output do job..."
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
           echo "✅ IP capturado e configurado com sucesso: $IP"
+
 
       - name: Apagar chave.json
         run: |
@@ -119,26 +111,23 @@ jobs:
       - name: Configurar Inventory
         run: |
           echo "📋 Configurando inventory do Ansible..."
-          
-          # Lê o IP do arquivo
-          VM_IP=$(cat $GITHUB_WORKSPACE/vm_ip.txt)
-          echo "📝 IP lido do arquivo: '$VM_IP'"
-          
-          # Verifica se o IP é válido
-          echo "🔍 Validando formato do IP..."
+    
+          VM_IP="${{ needs.infra.outputs.vm_ip }}"
+          echo "📝 IP capturado: '$VM_IP'"
+    
           if ! echo "$VM_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "❌ Erro: IP inválido recebido: '$VM_IP'"
             exit 1
           fi
           echo "✅ IP válido"
-          
-          # Cria o inventory
-          echo "📝 Criando arquivo inventory.ini..."
+    
+          mkdir -p ansible
           cat > ansible/inventory.ini << EOF
           [webserver]
           $VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
           EOF
           echo "✅ Inventory criado"
+
 
       - name: Debug Inventory
         run: |
