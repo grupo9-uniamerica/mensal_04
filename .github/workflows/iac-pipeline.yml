@@ -50,20 +50,38 @@ jobs:
       - name: Get VM IP
         id: ip
         run: |
+          echo "🚀 Iniciando captura do IP da VM..."
           cd terraform
-          # Captura o IP diretamente do output
-          IP=$(terraform output public_ip)
-          # Remove aspas e espaços extras
-          IP=$(echo $IP | tr -d '"' | xargs)
-          echo "IP capturado: $IP"
+          echo "📂 Diretório atual: $(pwd)"
+          
+          echo "🔍 Executando terraform output..."
+          terraform output -raw public_ip > ip_raw.txt
+          echo "📝 Conteúdo do ip_raw.txt:"
+          cat ip_raw.txt
+          
+          echo "🧹 Limpando o output..."
+          IP=$(cat ip_raw.txt | tr -d '\n' | tr -d '\r')
+          echo "📝 IP após limpeza: '$IP'"
+          
           if [ -z "$IP" ]; then
-            echo "❌ Erro: Não foi possível capturar o IP da VM"
+            echo "❌ Erro: IP está vazio"
             exit 1
           fi
+          
+          echo "💾 Salvando IP em arquivo..."
+          echo "$IP" > $GITHUB_WORKSPACE/vm_ip.txt
+          echo "📝 Conteúdo do vm_ip.txt:"
+          cat $GITHUB_WORKSPACE/vm_ip.txt
+          
+          echo "📤 Configurando output do job..."
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+          echo "✅ IP capturado e configurado com sucesso: $IP"
 
       - name: Apagar chave.json
-        run: rm terraform/chave.json
+        run: |
+          echo "🗑️ Removendo chave.json..."
+          rm terraform/chave.json
+          echo "✅ chave.json removida"
 
   deploy:
     name: Configure VM
@@ -76,50 +94,92 @@ jobs:
 
       - name: Setup Ansible
         run: |
+          echo "🚀 Configurando Ansible..."
           sudo apt update
           sudo apt install -y ansible sshpass
+          echo "✅ Ansible instalado"
+          ansible --version
 
       - name: Setup SSH key
         run: |
+          echo "🔑 Configurando chave SSH..."
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          echo "✅ Chave SSH configurada"
+          ls -la ~/.ssh/
 
       - name: Debug VM IP
         run: |
-          echo "VM IP recebido: '${{ needs.infra.outputs.vm_ip }}'"
+          echo "🔍 Verificando IP da VM..."
+          echo "IP do output do job anterior: '${{ needs.infra.outputs.vm_ip }}'"
+          echo "📝 Conteúdo do vm_ip.txt:"
+          cat $GITHUB_WORKSPACE/vm_ip.txt
 
       - name: Configurar Inventory
         run: |
-          VM_IP="${{ needs.infra.outputs.vm_ip }}"
+          echo "📋 Configurando inventory do Ansible..."
+          
+          # Lê o IP do arquivo
+          VM_IP=$(cat $GITHUB_WORKSPACE/vm_ip.txt)
+          echo "📝 IP lido do arquivo: '$VM_IP'"
+          
           # Verifica se o IP é válido
+          echo "🔍 Validando formato do IP..."
           if ! echo "$VM_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "❌ Erro: IP inválido recebido: $VM_IP"
+            echo "❌ Erro: IP inválido recebido: '$VM_IP'"
             exit 1
           fi
+          echo "✅ IP válido"
+          
+          # Cria o inventory
+          echo "📝 Criando arquivo inventory.ini..."
           cat > ansible/inventory.ini << EOF
           [webserver]
           $VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
           EOF
+          echo "✅ Inventory criado"
 
       - name: Debug Inventory
         run: |
-          echo "Conteúdo do inventory.ini:"
+          echo "🔍 Verificando inventory..."
+          echo "📝 Conteúdo do inventory.ini:"
           cat ansible/inventory.ini
+          echo "📝 Permissões do inventory.ini:"
+          ls -la ansible/inventory.ini
 
       - name: Testar conexão SSH
         run: |
-          VM_IP="${{ needs.infra.outputs.vm_ip }}"
-          echo "Testando conexão SSH com a VM ($VM_IP)..."
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$VM_IP 'echo "Conexão SSH bem sucedida!"'
+          echo "🔌 Testando conexão SSH..."
+          VM_IP=$(cat $GITHUB_WORKSPACE/vm_ip.txt)
+          echo "📝 IP para conexão: '$VM_IP'"
+          
+          echo "🔑 Verificando chave SSH..."
+          ls -la ~/.ssh/id_rsa
+          
+          echo "🔄 Tentando conexão SSH..."
+          ssh -v -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$VM_IP 'echo "Conexão SSH bem sucedida!"'
           if [ $? -eq 0 ]; then
             echo "✅ Conexão SSH estabelecida com sucesso!"
           else
             echo "❌ Falha na conexão SSH"
+            echo "🔍 Últimas linhas do log SSH:"
+            tail -n 20 ~/.ssh/ssh.log 2>/dev/null || echo "Log SSH não disponível"
             exit 1
           fi
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+          echo "🚀 Executando playbook Ansible..."
+          echo "📝 Conteúdo do playbook:"
+          cat ansible/playbook.yml
+          
+          echo "🔄 Iniciando execução..."
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -vvv
+          if [ $? -eq 0 ]; then
+            echo "✅ Playbook executado com sucesso!"
+          else
+            echo "❌ Falha na execução do playbook"
+            exit 1
+          fi
 
