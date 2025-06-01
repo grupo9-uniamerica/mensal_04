@@ -51,18 +51,16 @@ jobs:
         id: ip
         run: |
           cd terraform
-          # Instala o jq para processar JSON
-          sudo apt-get update && sudo apt-get install -y jq
-          # Captura o IP do estado do Terraform
-          terraform show -json > terraform-state.json
-          IP=$(jq -r '.values.outputs.public_ip.value' terraform-state.json)
+          # Captura o IP diretamente do output
+          IP=$(terraform output public_ip)
+          # Remove aspas e espaços extras
+          IP=$(echo $IP | tr -d '"' | xargs)
           echo "IP capturado: $IP"
           if [ -z "$IP" ]; then
             echo "❌ Erro: Não foi possível capturar o IP da VM"
             exit 1
           fi
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
-          rm terraform-state.json
 
       - name: Apagar chave.json
         run: rm terraform/chave.json
