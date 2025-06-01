@@ -51,19 +51,15 @@ jobs:
         id: ip
         run: |
           cd terraform
-          # Primeira tentativa: captura direta
-          if ! IP=$(terraform output -raw public_ip 2>/dev/null | tr -d '\n'); then
-            echo "Tentando método alternativo..."
-            # Segunda tentativa: usando arquivo temporário
-            terraform output -raw public_ip > /tmp/ip.txt 2>/dev/null
-            IP=$(cat /tmp/ip.txt | tr -d '\n')
-            rm /tmp/ip.txt
-          fi
+          # Captura o IP e limpa qualquer output adicional
+          IP=$(terraform output -raw public_ip | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
           echo "IP capturado: $IP"
           if [ -z "$IP" ]; then
             echo "❌ Erro: Não foi possível capturar o IP da VM"
             exit 1
           fi
+          # Salva o IP em um arquivo para o próximo job
+          echo "$IP" > $GITHUB_WORKSPACE/vm_ip.txt
           echo "vm_ip=$IP" >> $GITHUB_OUTPUT
 
       - name: Apagar chave.json
@@ -95,9 +91,15 @@ jobs:
 
       - name: Configurar Inventory
         run: |
+          VM_IP="${{ needs.infra.outputs.vm_ip }}"
+          # Verifica se o IP é válido
+          if ! echo "$VM_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "❌ Erro: IP inválido recebido: $VM_IP"
+            exit 1
+          fi
           cat > ansible/inventory.ini << EOF
           [webserver]
-          ${{ needs.infra.outputs.vm_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+          $VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
           EOF
 
       - name: Debug Inventory
@@ -107,8 +109,9 @@ jobs:
 
       - name: Testar conexão SSH
         run: |
-          echo "Testando conexão SSH com a VM..."
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ needs.infra.outputs.vm_ip }} 'echo "Conexão SSH bem sucedida!"'
+          VM_IP="${{ needs.infra.outputs.vm_ip }}"
+          echo "Testando conexão SSH com a VM ($VM_IP)..."
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$VM_IP 'echo "Conexão SSH bem sucedida!"'
           if [ $? -eq 0 ]; then
             echo "✅ Conexão SSH estabelecida com sucesso!"
           else
