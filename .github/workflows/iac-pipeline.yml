@@ -51,12 +51,13 @@ jobs:
         id: ip
         run: |
           cd terraform
-          sudo apt-get update && sudo apt-get install -y jq
-          # Tenta primeiro com output JSON
-          if ! IP=$(terraform output -json | jq -r '.public_ip.value'); then
+          # Primeira tentativa: captura direta
+          if ! IP=$(terraform output -raw public_ip 2>/dev/null | tr -d '\n'); then
             echo "Tentando método alternativo..."
-            # Método alternativo usando o estado
-            IP=$(terraform show -json | jq -r '.values.outputs.public_ip.value')
+            # Segunda tentativa: usando arquivo temporário
+            terraform output -raw public_ip > /tmp/ip.txt 2>/dev/null
+            IP=$(cat /tmp/ip.txt | tr -d '\n')
+            rm /tmp/ip.txt
           fi
           echo "IP capturado: $IP"
           if [ -z "$IP" ]; then
