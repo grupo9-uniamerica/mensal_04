@@ -51,6 +51,7 @@ jobs:
         id: ip
         run: |
           IP=$(terraform -chdir=terraform output -raw public_ip)
+          echo "IP capturado: $IP"
           {
             echo "vm_ip<<EOF"
             echo "$IP"
@@ -82,7 +83,7 @@ jobs:
 
       - name: Debug VM IP
         run: |
-          echo "VM IP recebido: ${{ needs.infra.outputs.vm_ip }}"
+          echo "VM IP recebido: '${{ needs.infra.outputs.vm_ip }}'"
 
       - name: Configurar Inventory
         run: |
