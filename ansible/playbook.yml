@@ -42,12 +42,20 @@
       args:
         creates: /etc/iptables/rules.v4
 
+    - name: Remover diretório do projeto se existir
+      file:
+        path: /home/ubuntu/seuprojeto
+        state: absent
+
     - name: Clone o repositório
       git:
         repo: 'https://github.com/grupo9-uniamerica/mensal_04.git'
         dest: /home/ubuntu/seuprojeto
+        version: master
+        force: yes
 
     - name: Subir com docker-compose
-      shell: docker-compose up -d
-      args:
-        chdir: /home/ubuntu/seuprojeto
+      shell: |
+        cd /home/ubuntu/seuprojeto
+        docker-compose down
+        docker-compose up -d --build
