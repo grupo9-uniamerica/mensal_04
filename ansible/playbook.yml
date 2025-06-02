@@ -1,6 +1,13 @@
 - hosts: webserver
   become: yes
   tasks:
+    - name: Configurar sudo sem senha para o usuário leona
+      lineinfile:
+        path: /etc/sudoers
+        line: "leona ALL=(ALL) NOPASSWD: ALL"
+        state: present
+        validate: 'visudo -cf %s'
+
     - name: Update apt
       apt:
         update_cache: yes
