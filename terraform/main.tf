@@ -101,7 +101,7 @@ resource "google_compute_instance" "vm_instance" {
   tags = ["allow-all"]
 
    metadata = {
-    ssh-keys = "ubuntu:${var.ssh_public_key}"
+    ssh-keys = "leona:${var.ssh_public_key}"
   }
 }
 

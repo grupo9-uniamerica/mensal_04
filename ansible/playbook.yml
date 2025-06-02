@@ -16,9 +16,9 @@
         name: docker-compose
         state: present
 
-    - name: Add ubuntu user to docker group
+    - name: Add leona user to docker group
       user:
-        name: ubuntu
+        name: leona
         groups: docker
         append: yes
 
@@ -45,9 +45,9 @@
     - name: Clone o repositório
       git:
         repo: 'https://github.com/grupo9-uniamerica/mensal_04.git'
-        dest: /home/ubuntu/seuprojeto
+        dest: /home/leona/seuprojeto
 
     - name: Subir com docker-compose
       shell: docker-compose up -d
       args:
-        chdir: /home/ubuntu/seuprojeto
+        chdir: /home/leona/seuprojeto
