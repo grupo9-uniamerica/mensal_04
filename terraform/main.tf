@@ -13,7 +13,7 @@ provider "google" {
 }
 
 variable "ssh_public_key" {
-  description = "Chave pública SSH para o usuário ubuntu"
+  description = "Chave pública SSH para o usuário leona"
   type        = string
 }
 
