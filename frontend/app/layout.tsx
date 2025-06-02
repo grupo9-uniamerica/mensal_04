@@ -27,10 +27,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {children}æ
         {/* Footer */}
         <footer style={styles}>
-          Version 1.9
+          Version 1.10
         </footer>
       </body>
     </html>
