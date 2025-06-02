@@ -1,75 +1,37 @@
 - hosts: webserver
   become: yes
-  become_method: sudo
-  become_user: root
   tasks:
-    - name: Garantir que o diretório sudoers.d existe
-      file:
-        path: /etc/sudoers.d
-        state: directory
-        mode: '0755'
-
-    - name: Configurar sudo sem senha para o usuário leona
-      copy:
-        content: "leona ALL=(ALL) NOPASSWD: ALL"
-        dest: /etc/sudoers.d/leona
-        mode: '0440'
-        validate: 'visudo -cf %s'
-      become: yes
-      become_method: sudo
-
-    - name: Garantir que o usuário leona existe
-      user:
-        name: leona
-        state: present
-        groups: sudo
-        append: yes
-      become: yes
-      become_method: sudo
-
     - name: Update apt
       apt:
         update_cache: yes
         upgrade: dist
-      become: yes
-      become_method: sudo
 
     - name: Install Docker
       apt:
         name: docker.io
         state: present
-      become: yes
-      become_method: sudo
 
     - name: Install Docker Compose
       apt:
         name: docker-compose
         state: present
-      become: yes
-      become_method: sudo
 
-    - name: Add leona user to docker group
+    - name: Add ubuntu user to docker group
       user:
-        name: leona
+        name: ubuntu
         groups: docker
         append: yes
-      become: yes
-      become_method: sudo
 
     - name: Install iptables-persistent
       apt:
         name: iptables-persistent
         state: present
-      become: yes
-      become_method: sudo
 
     - name: Create iptables directory
       file:
         path: /etc/iptables
         state: directory
         mode: '0755'
-      become: yes
-      become_method: sudo
 
     - name: Configure iptables rules
       shell: |
@@ -79,19 +41,13 @@
         iptables-save > /etc/iptables/rules.v4
       args:
         creates: /etc/iptables/rules.v4
-      become: yes
-      become_method: sudo
 
     - name: Clone o repositório
       git:
         repo: 'https://github.com/grupo9-uniamerica/mensal_04.git'
-        dest: /home/leona/seuprojeto
-      become: yes
-      become_method: sudo
+        dest: /home/ubuntu/seuprojeto
 
     - name: Subir com docker-compose
       shell: docker-compose up -d
       args:
-        chdir: /home/leona/seuprojeto
-      become: yes
-      become_method: sudo
+        chdir: /home/ubuntu/seuprojeto

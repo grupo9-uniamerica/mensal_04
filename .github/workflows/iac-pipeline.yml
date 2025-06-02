@@ -102,7 +102,7 @@ jobs:
           mkdir -p ansible
           cat > ansible/inventory.ini <<EOF
           [webserver]
-          $VM_IP ansible_user=leona ansible_ssh_private_key_file=~/.ssh/id_rsa
+          $VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
           EOF
           echo "✅ Inventory criado"
 
@@ -117,7 +117,7 @@ jobs:
           echo "🔌 Testando conexão SSH..."
           VM_IP="${{ needs.infra.outputs.vm_ip }}"
           echo "📝 IP para conexão: '$VM_IP'"
-          ssh -v leona@$VM_IP 'echo "Conexão SSH bem sucedida!"'
+          ssh -v ubuntu@$VM_IP 'echo "Conexão SSH bem sucedida!"'
           if [ $? -eq 0 ]; then
             echo "✅ Conexão SSH estabelecida com sucesso!"
           else

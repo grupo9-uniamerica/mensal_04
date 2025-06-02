@@ -13,7 +13,7 @@ provider "google" {
 }
 
 variable "ssh_public_key" {
-  description = "Chave pública SSH para o usuário leona"
+  description = "Chave pública SSH para o usuário ubuntu"
   type        = string
 }
 
@@ -101,7 +101,7 @@ resource "google_compute_instance" "vm_instance" {
   tags = ["allow-all"]
 
    metadata = {
-    ssh-keys = "leona:${var.ssh_public_key}"
+    ssh-keys = "ubuntu:${var.ssh_public_key}"
   }
 }
 
