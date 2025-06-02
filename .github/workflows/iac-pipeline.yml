@@ -85,6 +85,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          # Desabilitar verificação de fingerprint
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> ~/.ssh/config
           echo "✅ Chave SSH configurada"
           ls -la ~/.ssh/
 
@@ -115,7 +117,7 @@ jobs:
           echo "🔌 Testando conexão SSH..."
           VM_IP="${{ needs.infra.outputs.vm_ip }}"
           echo "📝 IP para conexão: '$VM_IP'"
-          ssh -v -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null leona@$VM_IP 'echo "Conexão SSH bem sucedida!"'
+          ssh -v leona@$VM_IP 'echo "Conexão SSH bem sucedida!"'
           if [ $? -eq 0 ]; then
             echo "✅ Conexão SSH estabelecida com sucesso!"
           else
