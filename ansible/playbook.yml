@@ -1,11 +1,17 @@
 - hosts: webserver
   become: yes
   tasks:
+    - name: Garantir que o diretório sudoers.d existe
+      file:
+        path: /etc/sudoers.d
+        state: directory
+        mode: '0755'
+
     - name: Configurar sudo sem senha para o usuário leona
-      lineinfile:
-        path: /etc/sudoers
-        line: "leona ALL=(ALL) NOPASSWD: ALL"
-        state: present
+      copy:
+        content: "leona ALL=(ALL) NOPASSWD: ALL"
+        dest: /etc/sudoers.d/leona
+        mode: '0440'
         validate: 'visudo -cf %s'
 
     - name: Update apt
