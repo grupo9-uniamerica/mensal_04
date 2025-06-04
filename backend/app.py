@@ -22,7 +22,7 @@ from models import (
     check_room_availability,  # Adicione esta importação
     create_tables  # Adicione esta importação
 )
-#teste3
+
 app = FastAPI(title="Sistema de Reserva de Salas",
               description="API para gerenciar salas e reservas",
               version="1.0.0")
