@@ -13,7 +13,7 @@ scrape_configs:
 
   - job_name: 'backend'
     static_configs:
-      - targets: ['host.docker.internal:8080']
+      - targets: ['34.95.147.47:8080']
 
   - job_name: 'blackbox'
     metrics_path: /probe
