@@ -7,8 +7,10 @@ from typing import Optional
 from database import get_db_connection, get_user_by_username
 from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
+from prometheus_fastapi_instrumentator import Instrumentator
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
 
 from models import (
     add_room, 
@@ -24,6 +26,9 @@ from models import (
 app = FastAPI(title="Sistema de Reserva de Salas",
               description="API para gerenciar salas e reservas",
               version="1.0.0")
+
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)              
 
 @app.get("/health")
 async def health_check():
