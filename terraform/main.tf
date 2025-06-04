@@ -82,6 +82,32 @@ resource "google_compute_firewall" "allow_all" {
   target_tags   = ["allow-all"]
 }
 
+resource "google_compute_firewall" "allow_prometheus" {
+  name    = "allow-prometheus"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["9090"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["prometheus-server"]
+}
+
+resource "google_compute_firewall" "allow_grafana" {
+  name    = "allow-grafana"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["grafana-server"]
+}
+
 resource "google_compute_instance" "vm_instance" {
   name         = "vm-iac"
   machine_type = "e2-medium"
@@ -98,7 +124,7 @@ resource "google_compute_instance" "vm_instance" {
     access_config {}
   }
 
-  tags = ["allow-all"]
+  tags = ["allow-all", "prometheus-server", "grafana-server"]
 
    metadata = {
     ssh-keys = "ubuntu:${var.ssh_public_key}"

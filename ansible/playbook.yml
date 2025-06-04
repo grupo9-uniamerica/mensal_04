@@ -59,3 +59,38 @@
         cd /home/ubuntu/seuprojeto
         docker-compose down
         docker-compose up -d --build
+
+    # Configuração do Monitoramento
+    - name: Criar diretório de monitoramento
+      file:
+        path: /home/ubuntu/monitoring
+        state: directory
+        mode: '0755'
+
+    - name: Copiar arquivo de configuração do Prometheus
+      copy:
+        src: files/prometheus.yml
+        dest: /home/ubuntu/monitoring/prometheus.yml
+        mode: '0644'
+
+    - name: Copiar docker-compose do monitoramento
+      copy:
+        src: files/docker-compose-monitoring.yml
+        dest: /home/ubuntu/monitoring/docker-compose.yml
+        mode: '0644'
+
+    - name: Subir containers de monitoramento
+      shell: |
+        cd /home/ubuntu/monitoring
+        docker-compose down
+        docker-compose up -d
+
+    - name: Aguardar serviços iniciarem
+      wait_for:
+        host: localhost
+        port: "{{ item }}"
+        timeout: 300
+      with_items:
+        - 9090  # Prometheus
+        - 3000  # Grafana
+        - 9100  # Node Exporter
