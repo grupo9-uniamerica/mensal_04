@@ -134,3 +134,49 @@ resource "google_compute_instance" "vm_instance" {
 output "public_ip" {
   value = google_compute_instance.vm_instance.network_interface[0].access_config[0].nat_ip
 }
+
+// Configuração do Cluster GKE
+resource "google_container_cluster" "primary" {
+  name     = "cluster-prod"
+  location = "southamerica-east1"
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
+
+  network_policy {
+    enabled = true
+  }
+
+  master_auth {
+    client_certificate_config {
+      issue_client_certificate = false
+    }
+  }
+}
+
+resource "google_container_node_pool" "primary_nodes" {
+  name       = "node-pool-prod"
+  cluster    = google_container_cluster.primary.name
+  location   = "southamerica-east1"
+  node_count = 2
+
+  node_config {
+    machine_type = "e2-medium"
+    disk_size_gb = 20
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/devstorage.read_only"
+    ]
+  }
+}
+
+// Output para o cluster GKE
+output "kubernetes_cluster_name" {
+  value = google_container_cluster.primary.name
+}
+
+output "kubernetes_cluster_endpoint" {
+  value = google_container_cluster.primary.endpoint
+}

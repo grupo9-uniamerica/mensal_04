@@ -42,23 +42,6 @@
       args:
         creates: /etc/iptables/rules.v4
 
-    - name: Remover diretório do projeto se existir
-      file:
-        path: /home/ubuntu/seuprojeto
-        state: absent
-
-    - name: Clone o repositório
-      git:
-        repo: 'https://github.com/grupo9-uniamerica/mensal_04.git'
-        dest: /home/ubuntu/seuprojeto
-        version: master
-        force: yes
-
-    - name: Subir com docker-compose
-      shell: |
-        cd /home/ubuntu/seuprojeto
-        docker-compose down
-        docker-compose up -d --build
 
     # Configuração do Monitoramento
     - name: Criar diretório de monitoramento
@@ -92,5 +75,5 @@
         timeout: 300
       with_items:
         - 9090  # Prometheus
-        - 3000  # Grafana
+        - 3001  # Grafana
         - 9100  # Node Exporter
