@@ -141,7 +141,7 @@ resource "google_container_cluster" "primary" {
   location = "southamerica-east1"
 
   remove_default_node_pool = true
-  initial_node_count       = 1
+  initial_node_count       = 0
 
   network_policy {
     enabled = true
@@ -153,6 +153,7 @@ resource "google_container_cluster" "primary" {
     }
   }
 }
+
 
 resource "google_container_node_pool" "primary_nodes" {
   name       = "node-pool-prod"
