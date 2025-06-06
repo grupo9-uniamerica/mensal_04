@@ -5,8 +5,8 @@ on:
     branches: [ master ]
 
 env:
-  GKE_CLUSTER: cluster
-  GKE_ZONE: southamerica-east1-a
+  GKE_CLUSTER: cluster-prod
+  GKE_ZONE: southamerica-east1
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
   DOCKER_USER: loungegario
@@ -79,7 +79,7 @@ jobs:
           gcloud components install gke-gcloud-auth-plugin --quiet
 
       - name: Get GKE Credentials
-        run: gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $PROJECT_ID
+        run: gcloud container clusters get-credentials $GKE_CLUSTER --region $GKE_ZONE --project $PROJECT_ID
 
       # Atualizar frontend no GKE
       - name: Update frontend deployment
