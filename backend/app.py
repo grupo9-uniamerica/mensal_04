@@ -51,7 +51,7 @@ app.add_middleware(
     allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permite todos os headers
 )
-#teste
+
 
 # Begin Login
 SECRET_KEY = "geladeiratsunami"

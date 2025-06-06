@@ -138,7 +138,7 @@ output "public_ip" {
 // Configuração do Cluster GKE
 resource "google_container_cluster" "primary" {
   name     = "cluster-prod"
-  location = "southamerica-east1-a"  # Região, não zona!
+  location = "southamerica-east1-a" 
 
   remove_default_node_pool = true
   initial_node_count       = 1 
@@ -157,7 +157,7 @@ resource "google_container_cluster" "primary" {
 resource "google_container_node_pool" "primary_nodes" {
   name     = "node-pool-prod"
   cluster  = google_container_cluster.primary.name
-  location = "southamerica-east1-a"  # Mesma região do cluster!
+  location = "southamerica-east1-a" 
 
   node_count = 1
 
