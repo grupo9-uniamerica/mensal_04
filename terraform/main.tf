@@ -159,12 +159,12 @@ resource "google_container_cluster" "primary" {
 resource "google_container_node_pool" "primary_nodes" {
   name       = "node-pool-prod"
   cluster    = google_container_cluster.primary.name
-  location   = "southamerica-east1"
+  location   = "southamerica-east1-a"
   node_count = 1
 
   node_config {
     machine_type = "e2-small"
-    disk_size_gb = 20
+    disk_size_gb = 30
     disk_type    = "pd-standard" 
 
     oauth_scopes = [
