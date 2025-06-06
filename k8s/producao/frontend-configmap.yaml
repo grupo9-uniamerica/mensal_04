@@ -7,5 +7,5 @@ data:
   NODE_ENV: "production"
   PORT: "3000"
   HOSTNAME: "0.0.0.0"
-  NEXT_PUBLIC_BASE_URL: "http://34.39.140.137"
-  NEXT_PUBLIC_APP_URL: "http://34.39.140.137"
+  NEXT_PUBLIC_BASE_URL: "http://35.198.60.97"
+  NEXT_PUBLIC_APP_URL: "http://35.198.60.97"
