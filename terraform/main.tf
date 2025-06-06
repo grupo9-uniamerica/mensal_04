@@ -138,10 +138,10 @@ output "public_ip" {
 // Configuração do Cluster GKE
 resource "google_container_cluster" "primary" {
   name     = "cluster-prod"
-  location = "southamerica-east1"
+  location = "southamerica-east1"  # Região, não zona!
 
   remove_default_node_pool = true
-  initial_node_count       = 1  
+  initial_node_count       = 1 
 
   network_policy {
     enabled = true
@@ -154,18 +154,17 @@ resource "google_container_cluster" "primary" {
   }
 }
 
-
-
 resource "google_container_node_pool" "primary_nodes" {
-  name       = "node-pool-prod"
-  cluster    = google_container_cluster.primary.name
-  location   = "southamerica-east1-a"
+  name     = "node-pool-prod"
+  cluster  = google_container_cluster.primary.name
+  location = "southamerica-east1"  # Mesma região do cluster!
+
   node_count = 1
 
   node_config {
     machine_type = "e2-small"
-    disk_size_gb = 30
-    disk_type    = "pd-standard" 
+    disk_size_gb = 20            # Reduzido para 20 GB
+    disk_type    = "pd-standard" # HDD para evitar uso de quota SSD
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
@@ -175,7 +174,7 @@ resource "google_container_node_pool" "primary_nodes" {
   }
 }
 
-// Output para o cluster GKE
+// Outputs
 output "kubernetes_cluster_name" {
   value = google_container_cluster.primary.name
 }
