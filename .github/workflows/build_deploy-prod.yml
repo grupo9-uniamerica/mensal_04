@@ -52,7 +52,7 @@ jobs:
         if: needs.changes.outputs.frontend == 'true'
         run: |
           docker build \
-            --build-arg NEXT_PUBLIC_APP_URL=http://35.198.60.97 \
+            --build-arg NEXT_PUBLIC_APP_URL=http://35.247.195.9 \
             --build-arg NEXT_PUBLIC_BACKEND_URL=http://backend.backend.svc.cluster.local:8080 \
             -t $FRONT_IMAGE ./frontend
           docker push $FRONT_IMAGE
