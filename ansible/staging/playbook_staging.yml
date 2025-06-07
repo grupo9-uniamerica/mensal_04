@@ -1,0 +1,79 @@
+- hosts: webserver
+  become: yes
+  tasks:
+    - name: Update apt
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Install iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+
+    - name: Create iptables directory
+      file:
+        path: /etc/iptables
+        state: directory
+        mode: '0755'
+
+    - name: Configure iptables rules
+      shell: |
+        iptables -A FORWARD -i docker0 -o eth0 -j ACCEPT
+        iptables -A FORWARD -i eth0 -o docker0 -j ACCEPT
+        iptables -A FORWARD -i docker0 -o docker0 -j ACCEPT
+        iptables-save > /etc/iptables/rules.v4
+      args:
+        creates: /etc/iptables/rules.v4
+
+
+    # Configuração do Monitoramento
+    - name: Criar diretório de monitoramento
+      file:
+        path: /home/ubuntu/monitoring
+        state: directory
+        mode: '0755'
+
+    - name: Copiar arquivo de configuração do Prometheus
+      copy:
+        src: files/prometheus.yml
+        dest: /home/ubuntu/monitoring/prometheus.yml
+        mode: '0644'
+
+    - name: Copiar docker-compose do monitoramento
+      copy:
+        src: files/docker-compose-monitoring.yml
+        dest: /home/ubuntu/monitoring/docker-compose.yml
+        mode: '0644'
+
+    - name: Subir containers de monitoramento
+      shell: |
+        cd /home/ubuntu/monitoring
+        docker-compose down
+        docker-compose up -d
+
+    - name: Aguardar serviços iniciarem
+      wait_for:
+        host: localhost
+        port: "{{ item }}"
+        timeout: 300
+      with_items:
+        - 9090  # Prometheus
+        - 3001  # Grafana
+        - 9100  # Node Exporter

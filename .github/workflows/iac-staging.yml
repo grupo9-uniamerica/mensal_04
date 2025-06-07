@@ -1,0 +1,138 @@
+name: IaC Pipeline
+
+on:
+  push:
+    branches:
+      - stage
+
+jobs:
+  infra:
+    name: Provision Infra
+    runs-on: ubuntu-latest
+    outputs:
+      vm_ip: ${{ steps.ip.outputs.vm_ip }}
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Criar chave.json
+        run: |
+          mkdir -p terraform
+          echo "${{ secrets.GCP_CREDENTIALS_STAGING }}" | base64 --decode > terraform/chave.json
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: '1.6.0'
+
+      - name: Set GOOGLE_APPLICATION_CREDENTIALS
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/terraform/chave.json" >> $GITHUB_ENV
+
+      - name: Init Terraform
+        run: cd terraform && terraform init
+
+      - name: Plan Terraform
+        run: |
+          cd terraform
+          terraform plan -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
+      - name: Apply Terraform
+        run: |
+          cd terraform
+          terraform apply -auto-approve -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
+      - name: Get VM IP
+        id: ip
+        run: |
+          echo "🚀 Iniciando captura do IP da VM..."
+          cd terraform
+          IP=$(terraform output -raw public_ip | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -n1)
+          echo "📝 IP capturado: '$IP'"
+          if [ -z "$IP" ]; then
+            echo "❌ Erro: IP está vazio"
+            exit 1
+          fi
+          echo "vm_ip=$IP" >> $GITHUB_OUTPUT
+          echo "✅ IP capturado e configurado com sucesso: $IP"
+
+      - name: Apagar chave.json
+        run: |
+          echo "🗑️ Removendo chave.json..."
+          rm terraform/chave.json
+          echo "✅ chave.json removida"
+
+  deploy:
+    name: Configure VM
+    needs: infra
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Setup Ansible
+        run: |
+          echo "🚀 Configurando Ansible..."
+          sudo apt update
+          sudo apt install -y ansible sshpass
+          echo "✅ Ansible instalado"
+          ansible --version
+
+      - name: Setup SSH key
+        run: |
+          echo "🔑 Configurando chave SSH..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # Desabilitar verificação de fingerprint
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> ~/.ssh/config
+          echo "✅ Chave SSH configurada"
+          ls -la ~/.ssh/
+
+      - name: Configurar Inventory
+        run: |
+          echo "📋 Configurando inventory do Ansible..."
+          VM_IP="${{ needs.infra.outputs.vm_ip }}"
+          echo "📝 IP capturado: '$VM_IP'"
+          if ! echo "$VM_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "❌ Erro: IP inválido recebido: '$VM_IP'"
+            exit 1
+          fi
+          mkdir -p ansible
+          cat > ansible/inventory.ini <<EOF
+          [webserver]
+          $VM_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+          EOF
+          echo "✅ Inventory criado"
+
+      - name: Debug Inventory
+        run: |
+          echo "🔍 Verificando inventory..."
+          cat ansible/inventory.ini
+          ls -la ansible/inventory.ini
+
+      - name: Testar conexão SSH
+        run: |
+          echo "🔌 Testando conexão SSH..."
+          VM_IP="${{ needs.infra.outputs.vm_ip }}"
+          echo "📝 IP para conexão: '$VM_IP'"
+          ssh -v ubuntu@$VM_IP 'echo "Conexão SSH bem sucedida!"'
+          if [ $? -eq 0 ]; then
+            echo "✅ Conexão SSH estabelecida com sucesso!"
+          else
+            echo "❌ Falha na conexão SSH"
+            exit 1
+          fi
+
+      - name: Run Ansible Playbook
+        run: |
+          echo "🚀 Executando playbook Ansible..."
+          cat ansible/playbook.yml
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -vvv
+          if [ $? -eq 0 ]; then
+            echo "✅ Playbook executado com sucesso!"
+          else
+            echo "❌ Falha na execução do playbook"
+            exit 1
+          fi

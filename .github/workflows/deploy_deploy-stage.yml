@@ -2,12 +2,12 @@ name: Deploy to Development
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ staging ]
 
 env:
-  GKE_CLUSTER: cluster
+  GKE_CLUSTER: cluster-staging
   GKE_ZONE: southamerica-east1-a
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID_STAGING }}
 
   DOCKER_USER: loungegario
   FRONT_IMAGE: loungegario/frontend-dev:latest
@@ -52,6 +52,7 @@ jobs:
         if: needs.changes.outputs.frontend == 'true'
         run: |
           docker build \
+            --no-cache \
             --build-arg NEXT_PUBLIC_APP_URL=http://35.198.6.122 \
             --build-arg NEXT_PUBLIC_BACKEND_URL=http://backend.backend-dev.svc.cluster.local:8080 \
             -t $FRONT_IMAGE ./frontend
@@ -68,7 +69,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY_STAGING }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
