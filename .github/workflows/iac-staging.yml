@@ -128,8 +128,8 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           echo "🚀 Executando playbook Ansible..."
-          cat ansible/playbook_staging.yml
-          ansible-playbook -i ansible/inventory.ini ansible/playbook_staging.yml -vvv
+          cat ansible/staging/playbook_staging.yml
+          ansible-playbook -i ansible/inventory.ini ansible/staging/playbook_staging.yml -vvv
           if [ $? -eq 0 ]; then
             echo "✅ Playbook executado com sucesso!"
           else
