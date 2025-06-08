@@ -18,8 +18,8 @@ jobs:
 
       - name: Criar chave.json
         run: |
-          mkdir -p terraform
-          echo "${{ secrets.GCP_CREDENTIALS_STAGING }}" | base64 --decode > terraform/chave.json
+          mkdir -p terraform/stage
+          echo "${{ secrets.GCP_CREDENTIALS_STAGING }}" | base64 --decode > terraform/stage/chave.json
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -27,26 +27,26 @@ jobs:
           terraform_version: '1.6.0'
 
       - name: Set GOOGLE_APPLICATION_CREDENTIALS
-        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/terraform/chave.json" >> $GITHUB_ENV
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/terraform/stage/chave.json" >> $GITHUB_ENV
 
       - name: Init Terraform
         run: cd terraform/stage && terraform init -reconfigure
 
       - name: Plan Terraform
         run: |
-          cd terraform
+          cd terraform/stage
           terraform plan -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Apply Terraform
         run: |
-          cd terraform
+          cd terraform/stage
           terraform apply -auto-approve -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Get VM IP
         id: ip
         run: |
           echo "🚀 Iniciando captura do IP da VM..."
-          cd terraform
+          cd terraform/stage
           IP=$(terraform output -raw public_ip | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -n1)
           echo "📝 IP capturado: '$IP'"
           if [ -z "$IP" ]; then
@@ -59,7 +59,7 @@ jobs:
       - name: Apagar chave.json
         run: |
           echo "🗑️ Removendo chave.json..."
-          rm terraform/chave.json
+          rm terraform/stage/chave.json
           echo "✅ chave.json removida"
 
   deploy:
