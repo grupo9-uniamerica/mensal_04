@@ -30,7 +30,7 @@ jobs:
         run: echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/terraform/chave.json" >> $GITHUB_ENV
 
       - name: Init Terraform
-        run: cd terraform && terraform init
+        run: cd terraform/stage && terraform init
 
       - name: Plan Terraform
         run: |

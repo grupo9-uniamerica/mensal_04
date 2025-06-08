@@ -1,3 +1,10 @@
+terraform {
+  backend "gcs" {
+    bucket = "projeto-iac-tfstate-loungegario-stage"   
+    prefix = "terraform/state"
+  }
+}
+
 provider "google" {
   credentials = file("chave.json")
   project     = "projeto-iac-462123"
