@@ -1,7 +1,15 @@
 # ========================
 # Terraform
 # ========================
-terraform/
+# Ignora tudo dentro da pasta terraform, inclusive subpastas e arquivos
+terraform/**
+
+# Permite especificamente esses dois arquivos:
+!terraform/main.tf
+!terraform/stage/
+!terraform/stage/main.tf
+
+# Continua ignorando os arquivos indesejados
 *.tfstate
 *.tfstate.backup
 *.tfvars
@@ -9,6 +17,7 @@ crash.log
 *.tfplan
 override.tf
 override.tf.json
+
 
 # Nunca subir chaves
 *.pem
