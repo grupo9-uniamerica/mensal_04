@@ -112,6 +112,10 @@ jobs:
       - name: Restart and Wait for Deployments
         run: |
           if [ "${{ needs.changes.outputs.frontend }}" == "true" ]; then
+            # Remove todos os pods antigos do frontend
+            kubectl delete pod -l app=frontend -n frontend-dev --grace-period=0 --force || true
+            while kubectl get pods -n frontend-dev -l app=frontend | grep -q frontend; do sleep 2; done
+
             kubectl rollout restart deployment/frontend -n frontend-dev
             kubectl rollout status deployment/frontend -n frontend-dev --timeout=300s
           fi
