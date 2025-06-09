@@ -11,6 +11,13 @@ scrape_configs:
     static_configs:
       - targets: ['node-exporter:9100']
 
+  - job_name: 'gke-kubernetes'
+    bearer_token: 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImRvemxtRW5yeFhkamU5X1hRTHNGQXEwVEpNMmV6Y2g4S0hMQnEtMUZKUUEifQ.eyJhdWQiOlsiaHR0cHM6Ly9jb250YWluZXIuZ29vZ2xlYXBpcy5jb20vdjEvcHJvamVjdHMvcHJvamV0by1pYWMtNDYyMTIzL2xvY2F0aW9ucy9zb3V0aGFtZXJpY2EtZWFzdDEtYS9jbHVzdGVycy9jbHVzdGVyLXByb2QiXSwiZXhwIjoxNzQ5NTE0Mjc2LCJpYXQiOjE3NDk1MTA2NzYsImlzcyI6Imh0dHBzOi8vY29udGFpbmVyLmdvb2dsZWFwaXMuY29tL3YxL3Byb2plY3RzL3Byb2pldG8taWFjLTQ2MjEyMy9sb2NhdGlvbnMvc291dGhhbWVyaWNhLWVhc3QxLWEvY2x1c3RlcnMvY2x1c3Rlci1wcm9kIiwianRpIjoiOGU5OGRmNzUtMzczMS00MDU2LTlhMWMtNzZjZmM5ZTE4ZTEzIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJtb25pdG9yaW5nIiwic2VydmljZWFjY291bnQiOnsibmFtZSI6InByb21ldGhldXMtZXh0ZXJuYWwiLCJ1aWQiOiJlNjA3ZmI1MC1kNWNlLTQzMzUtYWIxNC0xNDdkYjY1YzZmYmIifX0sIm5iZiI6MTc0OTUxMDY3Niwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om1vbml0b3Jpbmc6cHJvbWV0aGV1cy1leHRlcm5hbCJ9.hTna_3U7ebDM12eiq9-qhCPFlRhEbq2eRGQIlNmS9u3NRuY2cbUd1FqYAENVd391uNHpu6-tk1yJ7qQgYGvS5Wks7N6fIMywSf9tehta0TfY4ni-dpblMG6VHCYkgas3ywF7IEpqZ7cuqJESMoHXc9H8Zur7IVp4VA68Wn9kabR70Zk16ZsNwVIbtBP1EaxAnjQ32ojb1Uam0WlbUVqfURZepNnp_4p1U3u-ElzoIjncyC8nDBQaJN65dMBLhSkVSNIiKVYoUBf-lsRqPa-EMSbq-sZsd1sO_-IP_9xA7D6MzQDFYZi6OQV6sOcx0Lo1RVnfPnKOfbcNupmpNK-Tdw'
+    kubernetes_sd_configs:
+      - api_servers: ['https://35.198.39.155']
+    tls_config:
+      insecure_skip_verify: true
+
   #- job_name: 'backend'
   #  static_configs:
   #    - targets: ['34.95.147.47:8080']
