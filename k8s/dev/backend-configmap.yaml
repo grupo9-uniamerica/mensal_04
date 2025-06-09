@@ -4,7 +4,7 @@ metadata:
   name: backend-config
   namespace: backend-dev
 data:
-  DATABASE_HOST: "34.118.232.14"
+  DATABASE_HOST: "34.118.236.10"
   DATABASE_NAME: mydb
   DATABASE_PASSWORD: user
   DATABASE_PORT: "3306"

@@ -4,8 +4,8 @@ metadata:
   name: frontend-config
   namespace: frontend-dev
 data:
-  NEXT_PUBLIC_BASE_URL: "http://35.198.6.122"
-  NEXT_PUBLIC_APP_URL: "http://35.198.6.122"
+  NEXT_PUBLIC_BASE_URL: "http://34.151.227.32"
+  NEXT_PUBLIC_APP_URL: "http://34.151.227.32"
   NODE_ENV: "development"
   PORT: "3000"
   HOSTNAME: "0.0.0.0"

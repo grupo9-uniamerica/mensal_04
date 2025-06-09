@@ -51,7 +51,7 @@ jobs:
         run: |
           docker build \
             --no-cache \
-            --build-arg NEXT_PUBLIC_APP_URL=http://35.198.6.122 \
+            --build-arg NEXT_PUBLIC_APP_URL=http://34.151.227.32 \
             --build-arg NEXT_PUBLIC_BACKEND_URL=http://backend.backend-dev.svc.cluster.local:8080 \
             -t $FRONT_IMAGE ./frontend
           docker push $FRONT_IMAGE
