@@ -2,7 +2,7 @@ name: Deploy to Development
 
 on:
   push:
-    branches: [ staging ]
+    branches: [ stage ]
 
 env:
   GKE_CLUSTER: cluster-staging
