@@ -5,7 +5,7 @@ on:
     branches: [ stage ]
 
 env:
-  GKE_CLUSTER: cluster-staging
+  GKE_CLUSTER: cluster-prod
   GKE_ZONE: southamerica-east1-a
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID_STAGING }}
 

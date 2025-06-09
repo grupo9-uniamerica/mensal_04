@@ -137,7 +137,7 @@ output "public_ip" {
 
 // Configuração do Cluster GKE
 resource "google_container_cluster" "primary" {
-  name     = "cluster-staging"
+  name     = "cluster-prod"
   location = "southamerica-east1-a" 
 
   remove_default_node_pool = true
