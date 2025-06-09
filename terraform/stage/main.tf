@@ -158,7 +158,7 @@ resource "google_container_node_pool" "primary_nodes" {
   name       = "node-pool-prod-v2"
   cluster    = google_container_cluster.primary.name
   location   = "southamerica-east1-a"
-  node_count = 1
+  node_count = 3
 
   node_config {
     machine_type = "e2-small"
