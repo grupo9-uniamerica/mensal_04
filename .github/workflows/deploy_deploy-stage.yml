@@ -43,11 +43,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Docker Hub Login
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
-      # Build e push frontend se necessário
       - name: Build and Push Frontend
         if: needs.changes.outputs.frontend == 'true'
         run: |
@@ -58,14 +56,12 @@ jobs:
             -t $FRONT_IMAGE ./frontend
           docker push $FRONT_IMAGE
 
-      # Build e push backend se necessário
       - name: Build and Push Backend
         if: needs.changes.outputs.backend == 'true'
         run: |
           docker build -t $BACK_IMAGE ./backend
           docker push $BACK_IMAGE
 
-      # Autenticação GCP
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
@@ -74,41 +70,52 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      # Instalar plugin de autenticação GKE
       - name: Install GKE gcloud auth plugin
-        run: |
-          gcloud components install gke-gcloud-auth-plugin --quiet
+        run: gcloud components install gke-gcloud-auth-plugin --quiet
 
       - name: Get GKE Credentials
         run: gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $PROJECT_ID
 
-      # Atualizar frontend no GKE
+      # ------------------------
+      # NOVO BLOCO - Namespaces
+      # ------------------------
+      - name: Ensure Kubernetes Namespaces Exist
+        run: |
+          kubectl create namespace frontend-dev --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace backend-dev --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace database-dev --dry-run=client -o yaml | kubectl apply -f -
+
+      # ------------------------
+      # Aplicar os manifests
+      # ------------------------
+      - name: Apply Kubernetes Manifests
+        if: needs.changes.outputs.k8s == 'true'
+        run: |
+          kubectl apply -f k8s/dev/
+
+      # ------------------------
+      # Atualizar imagens se houve alteração
+      # ------------------------
       - name: Update frontend deployment
         if: needs.changes.outputs.frontend == 'true'
         run: |
           kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend-dev
-          
 
-      # Atualizar backend no GKE
       - name: Update backend deployment
         if: needs.changes.outputs.backend == 'true'
         run: |
           kubectl set image deployment/backend backend=$BACK_IMAGE -n backend-dev
-          
 
-      # Aplicar YAMLs do k8s se tiverem sido alterados
-      - name: Apply Kubernetes manifests
-        if: needs.changes.outputs.k8s == 'true'
-        run: |
-          kubectl apply -f k8s/dev/ 
-
-      # Reiniciar deployments após todas as alterações
-      - name: Restart deployments
+      # ------------------------
+      # Reiniciar os deployments e aguardar
+      # ------------------------
+      - name: Restart and Wait for Deployments
         run: |
           if [ "${{ needs.changes.outputs.frontend }}" == "true" ]; then
             kubectl rollout restart deployment/frontend -n frontend-dev
             kubectl rollout status deployment/frontend -n frontend-dev --timeout=300s
           fi
+
           if [ "${{ needs.changes.outputs.backend }}" == "true" ]; then
             kubectl rollout restart deployment/backend -n backend-dev
             kubectl rollout status deployment/backend -n backend-dev --timeout=300s
