@@ -94,36 +94,24 @@ jobs:
           kubectl apply -f k8s/dev/
 
       # ------------------------
-      # Atualizar imagens se houve alteração
+      # Atualizar imagens e reiniciar deployments
       # ------------------------
-      - name: Update frontend deployment
-        if: needs.changes.outputs.frontend == 'true'
-        run: |
-          kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend-dev
-
-      - name: Update backend deployment
-        if: needs.changes.outputs.backend == 'true'
-        run: |
-          kubectl set image deployment/backend backend=$BACK_IMAGE -n backend-dev
-
-      # ------------------------
-      # Reiniciar os deployments e aguardar
-      # ------------------------
-      - name: Restart and Wait for Deployments
+      - name: Update and Restart Deployments
         run: |
           if [ "${{ needs.changes.outputs.frontend }}" == "true" ]; then
-            # Primeiro, escala para 0 para garantir que todos os pods serão removidos
-            kubectl scale deployment frontend --replicas=0 -n frontend-dev
-      
-            # Aguarda os pods serem removidos
-            kubectl wait --for=delete pod -l app=frontend -n frontend-dev --timeout=60s || true
-      
-            # Agora escala de volta para 1 e faz o rollout
+            # Atualiza a imagem
+            kubectl set image deployment/frontend frontend=$FRONT_IMAGE -n frontend-dev
+            
+            # Reinicia o deployment
             kubectl rollout restart deployment/frontend -n frontend-dev
             kubectl rollout status deployment/frontend -n frontend-dev --timeout=300s
           fi
 
           if [ "${{ needs.changes.outputs.backend }}" == "true" ]; then
+            # Atualiza a imagem
+            kubectl set image deployment/backend backend=$BACK_IMAGE -n backend-dev
+            
+            # Reinicia o deployment
             kubectl rollout restart deployment/backend -n backend-dev
             kubectl rollout status deployment/backend -n backend-dev --timeout=300s
           fi

@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: frontend-config
   namespace: frontend-dev
+# teste
 data:
   NEXT_PUBLIC_BASE_URL: "http://34.151.227.32"
   NEXT_PUBLIC_APP_URL: "http://34.151.227.32"
