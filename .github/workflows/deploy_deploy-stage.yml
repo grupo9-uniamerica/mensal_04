@@ -20,6 +20,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
       k8s: ${{ steps.filter.outputs.k8s }}
+      monitoring: ${{ steps.filter.outputs.monitoring }}
     steps:
       - uses: actions/checkout@v3
 
@@ -34,11 +35,13 @@ jobs:
               - 'backend/**'
             k8s:
               - 'k8s/dev/**'
+            monitoring:
+              - 'k8s/monitoring/**'
 
   build-and-deploy:
     needs: changes
     runs-on: ubuntu-latest
-    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.k8s == 'true'
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.k8s == 'true' || needs.changes.outputs.monitoring == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -84,6 +87,7 @@ jobs:
           kubectl create namespace frontend-dev --dry-run=client -o yaml | kubectl apply -f -
           kubectl create namespace backend-dev --dry-run=client -o yaml | kubectl apply -f -
           kubectl create namespace database-dev --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
       # ------------------------
       # Aplicar os manifests
@@ -92,6 +96,14 @@ jobs:
         if: needs.changes.outputs.k8s == 'true'
         run: |
           kubectl apply -f k8s/dev/
+
+      # ------------------------
+      # Aplicar os manifests de monitoramento
+      # ------------------------
+      - name: Apply Monitoring Manifests
+        if: needs.changes.outputs.monitoring == 'true'
+        run: |
+          kubectl apply -f k8s/monitoring/
 
       # ------------------------
       # Atualizar imagens e reiniciar deployments
