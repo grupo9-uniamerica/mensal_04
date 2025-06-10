@@ -96,7 +96,7 @@ jobs:
           VM_IP="${{ needs.infra.outputs.vm_ip }}"
           echo "📝 IP capturado: '$VM_IP'"
           if ! echo "$VM_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "❌ Erro: IP inválido recebido: '$VM_IP'"
+            echo "❌ Error: IP inválido recebido: '$VM_IP'"
             exit 1
           fi
           mkdir -p ansible
