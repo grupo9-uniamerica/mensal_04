@@ -52,13 +52,13 @@
 
     - name: Copiar arquivo de configuração do Prometheus
       copy:
-        src: files/prometheus.yml
+        src: files_prod/prometheus.yml
         dest: /home/ubuntu/monitoring/prometheus.yml
         mode: '0644'
 
     - name: Copiar docker-compose do monitoramento
       copy:
-        src: files/docker-compose-monitoring.yml
+        src: files_prod/docker-compose-monitoring.yml
         dest: /home/ubuntu/monitoring/docker-compose.yml
         mode: '0644'
 
