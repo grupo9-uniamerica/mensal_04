@@ -173,7 +173,7 @@ class ReservationResponse(BaseModel):
 
     class Config:
         orm_mode = True
-#testeleo
+#teste
 # Endpoints
 @app.post("/rooms/", response_model=RoomResponse)
 def create_room(room: Room, current_user: str = Depends(get_current_user)):

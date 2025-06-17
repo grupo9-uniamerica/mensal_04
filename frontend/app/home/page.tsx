@@ -459,7 +459,7 @@ export default function StudyRoomScheduler() {
         available: true,
       };
   
-      // Envia para o backend com o token
+      // Envia para o backend com o toke
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/rooms`, {
         method: "POST",
         headers: {
