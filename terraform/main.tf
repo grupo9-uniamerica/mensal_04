@@ -152,6 +152,14 @@ resource "google_container_cluster" "primary" {
       issue_client_certificate = false
     }
   }
+
+   monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+  }
+
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+  }
 }
 
 resource "google_container_node_pool" "primary_nodes" {
